@@ -4,7 +4,8 @@ import type { Settings } from "../shared/types";
 import { DEFAULT_SETTINGS } from "../shared/types";
 import { controlsHTML, initControls, readControls } from "../shared/ui";
 
-document.getElementById("app")!.innerHTML = controlsHTML() + `<button id="save">Save</button>`;
+const SAVE_TEXT = "Save";
+document.getElementById("app")!.innerHTML = controlsHTML() + `<button id="save">${SAVE_TEXT}</button>`;
 
 initControls();
 
@@ -47,6 +48,6 @@ saveBtn.addEventListener("click", async () => {
   await chrome.storage.sync.set(settings);
   saveBtn.textContent = "Saved!";
   setTimeout(() => {
-    saveBtn.textContent = "Save";
+    saveBtn.textContent = SAVE_TEXT;
   }, 1500);
 });
