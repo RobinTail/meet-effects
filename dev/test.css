@@ -17,11 +17,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-.layout h1 {
-  margin: 0;
-  font-size: 20px;
-  text-align: center;
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    text-align: center;
+  }
 }
 .main {
   display: flex;
@@ -51,9 +52,10 @@ body {
   display: block;
   max-width: 640px;
   max-height: 480px;
-}
-#video.mirrored {
-  transform: scaleX(-1);
+
+  &.mirrored {
+    transform: scaleX(-1);
+  }
 }
 #overlay {
   position: absolute;
@@ -95,9 +97,10 @@ label {
   border-radius: 6px;
   background: #111;
   image-rendering: pixelated;
-}
-#picoDebug.hidden {
-  display: none;
+
+  &.hidden {
+    display: none;
+  }
 }
 .err {
   color: #f44;

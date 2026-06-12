@@ -16,8 +16,8 @@ button#save {
   background: #fff;
   cursor: pointer;
   margin-top: 4px;
-}
 
-button#save:hover {
-  background: #f0f0f0;
+  &:hover {
+    background: #f0f0f0;
+  }
 }
