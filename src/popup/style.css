@@ -1,0 +1,32 @@
+body {
+  width: 260px;
+  padding: 16px;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  margin: 0;
+}
+
+button#save {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #888;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+button#save:hover {
+  background: #f0f0f0;
+}
+
+#status {
+  display: block;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 6px;
+  color: #555;
+  min-height: 1.2em;
+}

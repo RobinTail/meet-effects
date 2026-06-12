@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dev Test</title>
+    <link rel="stylesheet" href="../src/shared/ui.css" />
+    <link rel="stylesheet" href="./test.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <h1>Dev Test</h1>
+      <div class="main">
+        <div class="sidebar">
+          <div id="app"></div>
+          <canvas id="picoDebug" class="hidden"></canvas>
+          <button id="startBtn">Start Webcam</button>
+          <button id="fileBtn">Start Local File…</button>
+          <input type="file" id="fileInput" accept="video/*" class="hidden" />
+        </div>
+        <div class="video-wrap">
+          <video id="video" autoplay playsinline muted></video>
+          <canvas id="overlay"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div id="stats">initializing…</div>
+
+    <script type="module" src="./test.ts"></script>
+  </body>
+</html>

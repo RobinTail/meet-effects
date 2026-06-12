@@ -1,0 +1,36 @@
+{
+  "name": "meet-effects",
+  "version": "0.2.0",
+  "private": true,
+  "description": "AI-driven Chrome extension that overlays features on detected faces in Google Meet",
+  "license": "MIT",
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm build && vite --mode dev",
+    "dev:page": "vite --mode dev",
+    "build": "tsc --noEmit && vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
+    "zip": "pnpm build && cd dist && zip -r ../meet-effects.zip . -x '*.DS_Store'"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.5.0",
+    "@eslint/js": "^10.0.1",
+    "@types/chrome": "^0.1.43",
+    "eslint": "^10.4.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "prettier": "^3.8.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.0",
+    "vite": "^8.0.16"
+  },
+  "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916"
+}
