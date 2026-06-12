@@ -39,6 +39,12 @@ const manifest: ManifestV3Export = {
   ],
 };
 
+/** shared between dev and prod builds */
+const commonDefinitions = {
+  APP_TITLE: JSON.stringify(appTitle),
+  FEATURES: JSON.stringify(availableFeatures),
+};
+
 export default defineConfig(({ mode }) => {
   if (mode === "dev") {
     return {
@@ -49,9 +55,8 @@ export default defineConfig(({ mode }) => {
       },
       appType: "mpa",
       define: {
-        APP_TITLE: JSON.stringify(appTitle),
+        ...commonDefinitions,
         CASCADE_URL: JSON.stringify("/cascades/facefinder"),
-        FEATURES: JSON.stringify(availableFeatures),
       },
     };
   }
@@ -59,9 +64,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [crx({ manifest })],
     define: {
-      APP_TITLE: JSON.stringify(appTitle),
+      ...commonDefinitions,
       CASCADE_URL: 'chrome.runtime.getURL("cascades/facefinder")',
-      FEATURES: JSON.stringify(availableFeatures),
     },
   };
 });
