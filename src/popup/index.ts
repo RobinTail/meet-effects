@@ -4,12 +4,7 @@ import type { Settings } from "../shared/types";
 import { DEFAULT_SETTINGS } from "../shared/types";
 import { controlsHTML, initControls, readControls } from "../shared/ui";
 
-document.getElementById("app")!.innerHTML =
-  controlsHTML() +
-  `
-  <button id="save">Save</button>
-  <span id="status"></span>
-`;
+document.getElementById("app")!.innerHTML = controlsHTML() + `<button id="save">Save</button>`;
 
 initControls();
 
