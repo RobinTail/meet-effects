@@ -2,7 +2,7 @@ import "./style.css";
 import "../shared/ui.css";
 import type { Settings } from "../shared/types";
 import { DEFAULT_SETTINGS } from "../shared/types";
-import { controlsHTML, initControls, readControls } from "../shared/ui";
+import { controlsHTML, initControls, readControls, el } from "../shared/ui";
 
 const SAVE_TEXT = "Save";
 document.getElementById("app")!.innerHTML = controlsHTML() + `<button id="save">${SAVE_TEXT}</button>`;
@@ -10,10 +10,6 @@ document.getElementById("app")!.innerHTML = controlsHTML() + `<button id="save">
 initControls();
 
 const saveBtn = document.getElementById("save") as HTMLButtonElement;
-
-function el<T extends HTMLElement>(id: string): T | null {
-  return document.getElementById(id) as T | null;
-}
 
 function setChecked(id: string, val: boolean) {
   const cb = el<HTMLInputElement>(id);

@@ -81,7 +81,7 @@ export function controlsHTML(): string {
   return html;
 }
 
-function el<T extends HTMLElement>(id: string): T | null {
+export function el<T extends HTMLElement>(id: string): T | null {
   return document.getElementById(id) as T | null;
 }
 
