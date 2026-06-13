@@ -25,79 +25,79 @@ const SHIFT_FACTOR = 0.1; // window moves by this fraction of its size each step
 const MIN_FACE_SIZE = 40; // smallest face to detect (in detection-image pixels)
 const SCALE_FACTOR = 1.1; // multiplier between successive window scales
 
-let sharedClassifyRegion: ((r: number, c: number, s: number, pixels: Int8Array, ldim: number) => number) | null = null;
-let cascadeLoaded = false;
-let cascadeError: string | null = null;
-
-async function loadCascade(): Promise<boolean> {
-  if (cascadeLoaded) return true;
-  if (cascadeError) return false;
-
-  try {
-    const response = await fetch(CASCADE_URL);
-    if (!response.ok) {
-      cascadeError = `HTTP ${response.status}`;
-      return false;
-    }
-    const buffer = await response.arrayBuffer();
-    const bytes = new Int8Array(buffer);
-    sharedClassifyRegion = unpackCascade(bytes);
-    cascadeLoaded = true;
-    return true;
-  } catch (err) {
-    cascadeError = String(err);
-    console.error(`${APP_TITLE}: failed to load cascade`, err);
-    return false;
-  }
-}
-
-async function runPicoDetection(
-  video: HTMLVideoElement,
-  debugCanvas?: HTMLCanvasElement,
-): Promise<{ dets: PicoDet[]; dimScale: number } | null> {
-  if (!sharedClassifyRegion) {
-    const loaded = await loadCascade();
-    if (!loaded) return null;
-  }
-
-  const vw = video.videoWidth;
-  const vh = video.videoHeight;
-  if (!vw || !vh) return null;
-
-  const dimScale = vw > vh ? Math.min(1, DETECT_MAX_DIM / vw) : Math.min(1, DETECT_MAX_DIM / vh);
-  const pw = Math.round(vw * dimScale);
-  const ph = Math.round(vh * dimScale);
-
-  const offscreen = document.createElement("canvas");
-  offscreen.width = pw;
-  offscreen.height = ph;
-  const ctx = offscreen.getContext("2d")!;
-  ctx.drawImage(video, 0, 0, pw, ph);
-
-  const imgData = ctx.getImageData(0, 0, pw, ph);
-  const picoImg = grayscale(imgData, pw, ph);
-  if (debugCanvas) renderPicoImage(picoImg, debugCanvas);
-
-  const dets = runCascade(picoImg, sharedClassifyRegion!, {
-    shiftfactor: SHIFT_FACTOR,
-    minsize: MIN_FACE_SIZE,
-    maxsize: Math.max(pw, ph),
-    scalefactor: SCALE_FACTOR,
-  });
-
-  return { dets, dimScale };
-}
-
 export class PicoDetector implements Detector {
   readonly name = "pico";
   private updateMemory: (dets: PicoDet[]) => PicoDet[];
+
+  private static classifyRegion: ReturnType<typeof unpackCascade> | null = null;
+  private static cascadeLoaded = false;
+  private static cascadeError: string | null = null;
 
   constructor() {
     this.updateMemory = instantiateDetectionMemory(MEMORY_SIZE);
   }
 
+  private static async loadCascade(): Promise<boolean> {
+    if (PicoDetector.cascadeLoaded) return true;
+    if (PicoDetector.cascadeError) return false;
+
+    try {
+      const response = await fetch(CASCADE_URL);
+      if (!response.ok) {
+        PicoDetector.cascadeError = `HTTP ${response.status}`;
+        return false;
+      }
+      const buffer = await response.arrayBuffer();
+      const bytes = new Int8Array(buffer);
+      PicoDetector.classifyRegion = unpackCascade(bytes);
+      PicoDetector.cascadeLoaded = true;
+      return true;
+    } catch (err) {
+      PicoDetector.cascadeError = String(err);
+      console.error(`${APP_TITLE}: failed to load cascade`, err);
+      return false;
+    }
+  }
+
+  private async runPicoDetection(
+    video: HTMLVideoElement,
+    debugCanvas?: HTMLCanvasElement,
+  ): Promise<{ dets: PicoDet[]; dimScale: number } | null> {
+    if (!PicoDetector.classifyRegion) {
+      const loaded = await PicoDetector.loadCascade();
+      if (!loaded) return null;
+    }
+
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (!vw || !vh) return null;
+
+    const dimScale = vw > vh ? Math.min(1, DETECT_MAX_DIM / vw) : Math.min(1, DETECT_MAX_DIM / vh);
+    const pw = Math.round(vw * dimScale);
+    const ph = Math.round(vh * dimScale);
+
+    const offscreen = document.createElement("canvas");
+    offscreen.width = pw;
+    offscreen.height = ph;
+    const ctx = offscreen.getContext("2d")!;
+    ctx.drawImage(video, 0, 0, pw, ph);
+
+    const imgData = ctx.getImageData(0, 0, pw, ph);
+    const picoImg = grayscale(imgData, pw, ph);
+    if (debugCanvas) renderPicoImage(picoImg, debugCanvas);
+
+    const dets = runCascade(picoImg, PicoDetector.classifyRegion!, {
+      shiftfactor: SHIFT_FACTOR,
+      minsize: MIN_FACE_SIZE,
+      maxsize: Math.max(pw, ph),
+      scalefactor: SCALE_FACTOR,
+    });
+
+    return { dets, dimScale };
+  }
+
   async init(): Promise<boolean> {
-    return loadCascade();
+    return PicoDetector.loadCascade();
   }
 
   async detect(
@@ -105,7 +105,7 @@ export class PicoDetector implements Detector {
     debugCanvas?: HTMLCanvasElement,
     currentlyHasFace?: boolean,
   ): Promise<FaceBox | null> {
-    const raw = await runPicoDetection(video, debugCanvas);
+    const raw = await this.runPicoDetection(video, debugCanvas);
     if (!raw) return null;
 
     const { dets, dimScale } = raw;
