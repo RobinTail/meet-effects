@@ -34,73 +34,73 @@ export interface PicoDet {
 }
 
 export function unpackCascade(bytes: Int8Array): ClassifyRegion {
-  const dview = new DataView(new ArrayBuffer(4));
+  const view = new DataView(new ArrayBuffer(4));
   let pos = 8;
-  dview.setUint8(0, bytes[pos + 0]);
-  dview.setUint8(1, bytes[pos + 1]);
-  dview.setUint8(2, bytes[pos + 2]);
-  dview.setUint8(3, bytes[pos + 3]);
-  const tdepth = dview.getInt32(0, true);
+  view.setUint8(0, bytes[pos + 0]);
+  view.setUint8(1, bytes[pos + 1]);
+  view.setUint8(2, bytes[pos + 2]);
+  view.setUint8(3, bytes[pos + 3]);
+  const treeDepth = view.getInt32(0, true);
   pos += 4;
-  dview.setUint8(0, bytes[pos + 0]);
-  dview.setUint8(1, bytes[pos + 1]);
-  dview.setUint8(2, bytes[pos + 2]);
-  dview.setUint8(3, bytes[pos + 3]);
-  const ntrees = dview.getInt32(0, true);
+  view.setUint8(0, bytes[pos + 0]);
+  view.setUint8(1, bytes[pos + 1]);
+  view.setUint8(2, bytes[pos + 2]);
+  view.setUint8(3, bytes[pos + 3]);
+  const nTrees = view.getInt32(0, true);
   pos += 4;
-  const tcodesLs: number[] = [];
-  const tpredsLs: number[] = [];
-  const threshLs: number[] = [];
-  const pow2tdepth = Math.pow(2, tdepth);
-  for (let tree = 0; tree < ntrees; ++tree) {
-    tcodesLs.push(0, 0, 0, 0);
-    for (let idx = 0; idx < 4 * pow2tdepth - 4; ++idx) {
-      tcodesLs.push(bytes[pos + idx]);
+  const codeList: number[] = [];
+  const predictionList: number[] = [];
+  const thresholdList: number[] = [];
+  const leafCount = Math.pow(2, treeDepth);
+  for (let tree = 0; tree < nTrees; ++tree) {
+    codeList.push(0, 0, 0, 0);
+    for (let idx = 0; idx < 4 * leafCount - 4; ++idx) {
+      codeList.push(bytes[pos + idx]);
     }
-    pos += 4 * pow2tdepth - 4;
-    for (let idx = 0; idx < pow2tdepth; ++idx) {
-      dview.setUint8(0, bytes[pos + 0]);
-      dview.setUint8(1, bytes[pos + 1]);
-      dview.setUint8(2, bytes[pos + 2]);
-      dview.setUint8(3, bytes[pos + 3]);
-      tpredsLs.push(dview.getFloat32(0, true));
+    pos += 4 * leafCount - 4;
+    for (let idx = 0; idx < leafCount; ++idx) {
+      view.setUint8(0, bytes[pos + 0]);
+      view.setUint8(1, bytes[pos + 1]);
+      view.setUint8(2, bytes[pos + 2]);
+      view.setUint8(3, bytes[pos + 3]);
+      predictionList.push(view.getFloat32(0, true));
       pos += 4;
     }
-    dview.setUint8(0, bytes[pos + 0]);
-    dview.setUint8(1, bytes[pos + 1]);
-    dview.setUint8(2, bytes[pos + 2]);
-    dview.setUint8(3, bytes[pos + 3]);
-    threshLs.push(dview.getFloat32(0, true));
+    view.setUint8(0, bytes[pos + 0]);
+    view.setUint8(1, bytes[pos + 1]);
+    view.setUint8(2, bytes[pos + 2]);
+    view.setUint8(3, bytes[pos + 3]);
+    thresholdList.push(view.getFloat32(0, true));
     pos += 4;
   }
-  const tcodes = new Int8Array(tcodesLs);
-  const tpreds = new Float32Array(tpredsLs);
-  const thresh = new Float32Array(threshLs);
+  const codes = new Int8Array(codeList);
+  const predictions = new Float32Array(predictionList);
+  const thresholds = new Float32Array(thresholdList);
 
   return (row, col, scale, pixels, ldim) => {
     row = 256 * row;
     col = 256 * col;
     let root = 0;
     let sum = 0.0;
-    for (let tree = 0; tree < ntrees; ++tree) {
+    for (let tree = 0; tree < nTrees; ++tree) {
       let idx = 1;
-      for (let depth = 0; depth < tdepth; ++depth) {
+      for (let depth = 0; depth < treeDepth; ++depth) {
         idx =
           2 * idx +
           (pixels[
-            ((row + tcodes[root + 4 * idx + 0] * scale) >> 8) * ldim + ((col + tcodes[root + 4 * idx + 1] * scale) >> 8)
+            ((row + codes[root + 4 * idx + 0] * scale) >> 8) * ldim + ((col + codes[root + 4 * idx + 1] * scale) >> 8)
           ] <=
           pixels[
-            ((row + tcodes[root + 4 * idx + 2] * scale) >> 8) * ldim + ((col + tcodes[root + 4 * idx + 3] * scale) >> 8)
+            ((row + codes[root + 4 * idx + 2] * scale) >> 8) * ldim + ((col + codes[root + 4 * idx + 3] * scale) >> 8)
           ]
             ? 1
             : 0);
       }
-      sum += tpreds[pow2tdepth * tree + idx - pow2tdepth];
-      if (sum <= thresh[tree]) return -1;
-      root += 4 * pow2tdepth;
+      sum += predictions[leafCount * tree + idx - leafCount];
+      if (sum <= thresholds[tree]) return -1;
+      root += 4 * leafCount;
     }
-    return sum - thresh[ntrees - 1];
+    return sum - thresholds[nTrees - 1];
   };
 }
 
