@@ -47,6 +47,10 @@ export interface FaceBox {
   eyeRX?: number;
   /** Right eye center y-coordinate (from native landmark detector). */
   eyeRY?: number;
+  /** Mouth center x-coordinate (from native landmark detector). */
+  mouthX?: number;
+  /** Mouth center y-coordinate (from native landmark detector). */
+  mouthY?: number;
 }
 
 /** Runtime state the detection loop and renderers share for a single video element. */

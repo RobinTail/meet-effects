@@ -17,6 +17,15 @@ export function renderDebugBox(
   ctx.strokeRect(dx, box.y * scaleY, box.width * scaleX, box.height * scaleY);
   ctx.setLineDash([]);
 
+  if (box.mouthX !== undefined && box.mouthY !== undefined) {
+    const mx = mirrored ? canvasW - box.mouthX * scaleX : box.mouthX * scaleX;
+    const my = box.mouthY * scaleY;
+    ctx.fillStyle = "#ff69b4";
+    ctx.beginPath();
+    ctx.ellipse(mx, my, box.width * scaleX * 0.06, box.height * scaleY * 0.04, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   const eyes = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored);
   if (!eyes) return;
 

@@ -46,17 +46,19 @@ export class NativeDetector implements Detector {
           result.eyeRY = eyes[1].locations[0]?.y;
         }
 
+        const mouth = face.landmarks.find((lm) => lm.type === "mouth");
+        if (mouth?.locations?.[0]) {
+          result.mouthX = mouth.locations[0].x;
+          result.mouthY = mouth.locations[0].y;
+        }
+
         const nose = face.landmarks.find((lm) => lm.type === "nose");
         if (nose?.locations?.[0]) {
           result.noseX = nose.locations[0].x;
           result.noseY = nose.locations[0].y;
-        } else if (result.eyeLY !== undefined && result.eyeRY !== undefined) {
-          const mouth = face.landmarks.find((lm) => lm.type === "mouth");
-          if (mouth?.locations?.[0]) {
-            const eyesMidY = (result.eyeLY + result.eyeRY) / 2;
-            result.noseX = mouth.locations[0].x;
-            result.noseY = (eyesMidY + mouth.locations[0].y) / 2;
-          }
+        } else if (result.eyeLY !== undefined && result.eyeRY !== undefined && result.mouthY !== undefined) {
+          result.noseX = result.mouthX;
+          result.noseY = ((result.eyeLY + result.eyeRY) / 2 + result.mouthY) / 2;
         }
       }
 
