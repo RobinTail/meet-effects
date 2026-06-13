@@ -24,7 +24,7 @@ export function renderCrown(
   const cw = box.width * scaleX;
   const ch = box.height * crownSize * scaleY;
 
-  const { angle } = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored);
+  const angle = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored)?.angle ?? 0;
 
   ctx.save();
 

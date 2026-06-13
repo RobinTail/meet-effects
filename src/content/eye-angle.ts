@@ -1,9 +1,5 @@
 import type { FaceBox } from "../shared/types";
 
-const EYE_CX = 0.3;
-const EYE_CY = 0.35;
-const EYE_SPACING = 0.4;
-
 export interface EyeInfo {
   cx: number;
   cy: number;
@@ -15,16 +11,21 @@ export interface EyeInfo {
   halfDist: number;
 }
 
-export function getEyeInfo(box: FaceBox, canvasW: number, scaleX: number, scaleY: number, mirrored: boolean): EyeInfo {
-  const eyeLX = box.eyeLX ?? box.x + box.width * EYE_CX;
-  const eyeLY = box.eyeLY ?? box.y + box.height * EYE_CY;
-  const eyeRX = box.eyeRX ?? box.x + box.width * (EYE_CX + EYE_SPACING);
-  const eyeRY = box.eyeRY ?? box.y + box.height * EYE_CY;
+export function getEyeInfo(
+  box: FaceBox,
+  canvasW: number,
+  scaleX: number,
+  scaleY: number,
+  mirrored: boolean,
+): EyeInfo | undefined {
+  if (box.eyeLX === undefined || box.eyeLY === undefined || box.eyeRX === undefined || box.eyeRY === undefined) {
+    return undefined;
+  }
 
-  const lx = eyeLX * scaleX;
-  const ly = eyeLY * scaleY;
-  const rx = eyeRX * scaleX;
-  const ry = eyeRY * scaleY;
+  const lx = box.eyeLX * scaleX;
+  const ly = box.eyeLY * scaleY;
+  const rx = box.eyeRX * scaleX;
+  const ry = box.eyeRY * scaleY;
 
   const faceAngle = Math.atan2(ry - ly, rx - lx);
   const angle = mirrored ? -faceAngle : faceAngle;

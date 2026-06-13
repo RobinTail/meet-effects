@@ -1,6 +1,9 @@
 import type { FaceBox } from "../shared/types";
 import { getEyeInfo } from "./eye-angle";
 
+const EYE_CY = 0.35;
+const EYE_SPACING = 0.4;
+
 export function renderSunglasses(
   ctx: CanvasRenderingContext2D,
   box: FaceBox,
@@ -10,7 +13,12 @@ export function renderSunglasses(
   mirrored: boolean,
   sunglassesSize: number,
 ) {
-  const { midX, midY, angle, halfDist } = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored);
+  const info = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored);
+  const boxMidX = mirrored ? canvasW - (box.x + box.width / 2) * scaleX : (box.x + box.width / 2) * scaleX;
+  const midX = info?.midX ?? boxMidX;
+  const midY = info?.midY ?? (box.y + box.height * EYE_CY) * scaleY;
+  const angle = info?.angle ?? 0;
+  const halfDist = info?.halfDist ?? (box.width * EYE_SPACING * scaleX) / 2;
 
   const lensW = box.width * sunglassesSize * 0.5 * scaleX;
   const lensH = lensW * 0.5;

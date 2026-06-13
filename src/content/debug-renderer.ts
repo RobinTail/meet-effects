@@ -17,12 +17,15 @@ export function renderDebugBox(
   ctx.strokeRect(dx, box.y * scaleY, box.width * scaleX, box.height * scaleY);
   ctx.setLineDash([]);
 
-  const { cx, cy, cx2, cy2 } = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored);
-  const eyeR = Math.max(3, box.width * scaleX * 0.04);
+  const eyes = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored);
+  if (!eyes) return;
+
+  const { cx, cy, cx2, cy2, halfDist, angle } = eyes;
+  const eyeR = Math.max(2, halfDist * 0.25);
 
   const boxLeft = dx;
   const boxRight = dx + box.width * scaleX;
-  const slope = (cy2 - cy) / (cx2 - cx);
+  const slope = Math.tan(angle);
   const eyeLineY1 = cy + slope * (boxLeft - cx);
   const eyeLineY2 = cy + slope * (boxRight - cx);
   ctx.strokeStyle = "#ffdd44";
