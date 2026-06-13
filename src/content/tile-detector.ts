@@ -6,31 +6,28 @@ const VIDEO_SELECTORS = ['video[src*="blob:"]', "video[autoplay]"];
 const CONTAINER_OBSERVER_SELECTORS = ["[data-participant-id]", '[role="presentation"]', "[jsname]"];
 
 export class TileDetector {
-  private tiles = new Map<HTMLVideoElement, OverlayState>();
+  private videos = new Set<HTMLVideoElement>();
   private overlay = new OverlayManager();
   private observer: MutationObserver | null = null;
   private pollTimer: ReturnType<typeof setInterval> | null = null;
-  private running = false;
-  private onChange: (tiles: OverlayState[]) => void;
+  private isRunning = false;
 
-  constructor(onChange: (tiles: OverlayState[]) => void) {
-    this.onChange = onChange;
-  }
+  constructor(private readonly onChange: (tiles: OverlayState[]) => void) {}
 
   start() {
-    if (this.running) return;
-    this.running = true;
+    if (this.isRunning) return;
+    this.isRunning = true;
     this.initialScan();
     this.startObserver();
     this.startPolling();
   }
 
   stop() {
-    this.running = false;
+    this.isRunning = false;
     this.observer?.disconnect();
     if (this.pollTimer) clearInterval(this.pollTimer);
     this.overlay.destroy();
-    this.tiles.clear();
+    this.videos.clear();
   }
 
   private initialScan() {
@@ -45,32 +42,32 @@ export class TileDetector {
   }
 
   private addTile(video: HTMLVideoElement) {
-    if (this.tiles.has(video)) return;
+    if (this.videos.has(video)) return;
 
-    const state = this.overlay.attach(video);
-    this.tiles.set(video, state);
+    this.overlay.attach(video);
+    this.videos.add(video);
     console.log(`${APP_TITLE}: tile added`, video);
   }
 
   private removeTile(video: HTMLVideoElement) {
-    if (!this.tiles.has(video)) return;
+    if (!this.videos.has(video)) return;
 
     this.overlay.detach(video);
-    this.tiles.delete(video);
+    this.videos.delete(video);
     console.log(`${APP_TITLE}: tile removed`, video);
   }
 
   private syncTiles() {
     const live = new Set(this.findVideos());
 
-    for (const [video] of this.tiles) {
+    for (const video of this.videos) {
       if (!live.has(video) || !document.contains(video)) {
         this.removeTile(video);
       }
     }
 
     for (const video of live) {
-      if (!this.tiles.has(video)) {
+      if (!this.videos.has(video)) {
         this.addTile(video);
       }
     }
@@ -99,6 +96,11 @@ export class TileDetector {
   }
 
   private emit() {
-    this.onChange(Array.from(this.tiles.values()));
+    const tiles: OverlayState[] = [];
+    for (const video of this.videos) {
+      const state = this.overlay.getState(video);
+      if (state) tiles.push(state);
+    }
+    this.onChange(tiles);
   }
 }
