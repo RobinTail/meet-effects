@@ -6,7 +6,7 @@ import {
   clusterDetections,
   instantiateDetectionMemory,
 } from "./pico";
-import type { PicoDet } from "./pico";
+import type { PicoDet, ClassifyRegion } from "./pico";
 import type { Detector } from "./detector";
 import type { FaceBox } from "../shared/types";
 
@@ -29,7 +29,7 @@ export class PicoDetector implements Detector {
   readonly name = "pico";
   private updateMemory: (dets: PicoDet[]) => PicoDet[];
 
-  private static classifyRegion: ReturnType<typeof unpackCascade> | null = null;
+  private static classifyRegion: ClassifyRegion | null = null;
   private static cascadeLoaded = false;
   private static cascadeError: string | null = null;
 

@@ -6,6 +6,9 @@
  * http://arxiv.org/abs/1305.4537
  */
 
+/** Function that classifies a region (row, col, scale) as face or non-face. */
+export type ClassifyRegion = (row: number, col: number, scale: number, pixels: Int8Array, ldim: number) => number;
+
 /** Grayscale image used as input for pico face detection. */
 export interface PicoImage {
   /** Luma (brightness) values, one byte per pixel, row-major order. */
@@ -30,9 +33,7 @@ export interface PicoDet {
   score: number;
 }
 
-export function unpackCascade(
-  bytes: Int8Array,
-): (row: number, col: number, scale: number, pixels: Int8Array, ldim: number) => number {
+export function unpackCascade(bytes: Int8Array): ClassifyRegion {
   const dview = new DataView(new ArrayBuffer(4));
   let pos = 8;
   dview.setUint8(0, bytes[pos + 0]);
@@ -76,7 +77,7 @@ export function unpackCascade(
   const tpreds = new Float32Array(tpredsLs);
   const thresh = new Float32Array(threshLs);
 
-  return function classifyRegion(row: number, col: number, scale: number, pixels: Int8Array, ldim: number): number {
+  return (row, col, scale, pixels, ldim) => {
     row = 256 * row;
     col = 256 * col;
     let root = 0;
@@ -105,7 +106,7 @@ export function unpackCascade(
 
 export function runCascade(
   image: PicoImage,
-  classifyRegion: (row: number, col: number, scale: number, pixels: Int8Array, ldim: number) => number,
+  classifyRegion: ClassifyRegion,
   params: { shiftfactor: number; minsize: number; maxsize: number; scalefactor: number },
 ): PicoDet[] {
   const { pixels, nrows, ncols, ldim } = image;
