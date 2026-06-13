@@ -148,18 +148,18 @@ const CLUSTER_Q_MODE: "sum" | "mean" = "mean";
  * Both are represented as (row, col, size) where size is the square side length.
  * @returns number - Ratio in [0, 1] — 0 (none) to 1 (identical).
  */
-function getOverlap(findingA: Finding, findingB: Finding): number {
+function getOverlap(one: Finding, other: Finding): number {
   const overRow = Math.max(
     0,
-    Math.min(findingA.row + findingA.size / 2, findingB.row + findingB.size / 2) -
-      Math.max(findingA.row - findingA.size / 2, findingB.row - findingB.size / 2),
+    Math.min(one.row + one.size / 2, other.row + other.size / 2) -
+      Math.max(one.row - one.size / 2, other.row - other.size / 2),
   );
   const overCol = Math.max(
     0,
-    Math.min(findingA.col + findingA.size / 2, findingB.col + findingB.size / 2) -
-      Math.max(findingA.col - findingA.size / 2, findingB.col - findingB.size / 2),
+    Math.min(one.col + one.size / 2, other.col + other.size / 2) -
+      Math.max(one.col - one.size / 2, other.col - other.size / 2),
   );
-  return (overRow * overCol) / (findingA.size * findingA.size + findingB.size * findingB.size - overRow * overCol);
+  return (overRow * overCol) / (one.size * one.size + other.size * other.size - overRow * overCol);
 }
 
 export function clusterDetections(findings: Finding[], minOverlap: number): Finding[] {
