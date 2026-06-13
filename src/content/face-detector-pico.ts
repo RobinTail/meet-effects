@@ -6,7 +6,7 @@ import {
   clusterDetections,
   instantiateDetectionMemory,
 } from "./pico";
-import type { PicoDet, ClassifyRegion, UpdateMemory } from "./pico";
+import type { Finding, ClassifyRegion, UpdateMemory } from "./pico";
 import type { Detector } from "./detector";
 import type { FaceBox } from "../shared/types";
 
@@ -62,7 +62,7 @@ export class PicoDetector implements Detector {
   private async runPicoDetection(
     video: HTMLVideoElement,
     debugCanvas?: HTMLCanvasElement,
-  ): Promise<{ dets: PicoDet[]; dimScale: number } | null> {
+  ): Promise<{ findings: Finding[]; dimScale: number } | null> {
     if (!PicoDetector.classifyRegion) {
       const loaded = await PicoDetector.loadCascade();
       if (!loaded) return null;
@@ -86,14 +86,14 @@ export class PicoDetector implements Detector {
     const picoImg = grayscale(imgData, pw, ph);
     if (debugCanvas) renderPicoImage(picoImg, debugCanvas);
 
-    const dets = runCascade(picoImg, PicoDetector.classifyRegion!, {
+    const findings = runCascade(picoImg, PicoDetector.classifyRegion!, {
       shiftFactor: SHIFT_FACTOR,
       minSize: MIN_FACE_SIZE,
       maxSize: Math.max(pw, ph),
       scaleFactor: SCALE_FACTOR,
     });
 
-    return { dets, dimScale };
+    return { findings, dimScale };
   }
 
   async init(): Promise<boolean> {
@@ -108,11 +108,11 @@ export class PicoDetector implements Detector {
     const raw = await this.runPicoDetection(video, debugCanvas);
     if (!raw) return null;
 
-    const { dets, dimScale } = raw;
-    const accumulated = this.updateMemory(dets);
+    const { findings, dimScale } = raw;
+    const accumulated = this.updateMemory(findings);
     const clustered = clusterDetections(accumulated, MIN_OVERLAP);
     const threshold = currentlyHasFace ? HOLD_SCORE : ACQUIRE_SCORE;
-    const best = clustered.find((det) => det.score >= threshold);
+    const best = clustered.find((one) => one.score >= threshold);
     if (!best) return null;
 
     const invScale = 1 / dimScale;

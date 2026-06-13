@@ -32,10 +32,10 @@ export interface CascadeParams {
 }
 
 /** Accumulates detections across frames for temporal smoothing. */
-export type UpdateMemory = (dets: PicoDet[]) => PicoDet[];
+export type UpdateMemory = (findings: Finding[]) => Finding[];
 
 /** A single face detection result, in detection-image coordinates. */
-export interface PicoDet {
+export interface Finding {
   /** Row (y) of the detection-window center. */
   row: number;
   /** Column (x) of the detection-window center. */
@@ -105,11 +105,11 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
   };
 }
 
-export function runCascade(image: PicoImage, classifyRegion: ClassifyRegion, params: CascadeParams): PicoDet[] {
+export function runCascade(image: PicoImage, classifyRegion: ClassifyRegion, params: CascadeParams): Finding[] {
   const { pixels, height, width } = image;
   const { shiftFactor, minSize, maxSize, scaleFactor } = params;
   let scale = minSize;
-  const dets: PicoDet[] = [];
+  const findings: Finding[] = [];
   while (scale <= maxSize) {
     const step = Math.max(shiftFactor * scale, 1) >> 0;
     const offset = (scale / 2 + 1) >> 0;
@@ -117,13 +117,13 @@ export function runCascade(image: PicoImage, classifyRegion: ClassifyRegion, par
       for (let col = offset; col <= width - offset; col += step) {
         const score = classifyRegion(row, col, scale, pixels, width);
         if (score > 0.0) {
-          dets.push({ row, col, size: scale, score });
+          findings.push({ row, col, size: scale, score });
         }
       }
     }
     scale = scale * scaleFactor;
   }
-  return dets;
+  return findings;
 }
 
 /**
@@ -148,38 +148,38 @@ const CLUSTER_Q_MODE: "sum" | "mean" = "mean";
  * Both are represented as (row, col, size) where size is the square side length.
  * @returns number - Ratio in [0, 1] — 0 (none) to 1 (identical).
  */
-function getOverlap(detA: PicoDet, detB: PicoDet): number {
+function getOverlap(findingA: Finding, findingB: Finding): number {
   const overRow = Math.max(
     0,
-    Math.min(detA.row + detA.size / 2, detB.row + detB.size / 2) -
-      Math.max(detA.row - detA.size / 2, detB.row - detB.size / 2),
+    Math.min(findingA.row + findingA.size / 2, findingB.row + findingB.size / 2) -
+      Math.max(findingA.row - findingA.size / 2, findingB.row - findingB.size / 2),
   );
   const overCol = Math.max(
     0,
-    Math.min(detA.col + detA.size / 2, detB.col + detB.size / 2) -
-      Math.max(detA.col - detA.size / 2, detB.col - detB.size / 2),
+    Math.min(findingA.col + findingA.size / 2, findingB.col + findingB.size / 2) -
+      Math.max(findingA.col - findingA.size / 2, findingB.col - findingB.size / 2),
   );
-  return (overRow * overCol) / (detA.size * detA.size + detB.size * detB.size - overRow * overCol);
+  return (overRow * overCol) / (findingA.size * findingA.size + findingB.size * findingB.size - overRow * overCol);
 }
 
-export function clusterDetections(dets: PicoDet[], minOverlap: number): PicoDet[] {
-  dets = dets.sort((detA, detB) => detB.score - detA.score);
-  const assignments = new Array(dets.length).fill(0);
-  const clusters: PicoDet[] = [];
-  for (let idx = 0; idx < dets.length; ++idx) {
+export function clusterDetections(findings: Finding[], minOverlap: number): Finding[] {
+  findings = findings.sort((findingA, findingB) => findingB.score - findingA.score);
+  const assignments = new Array(findings.length).fill(0);
+  const clusters: Finding[] = [];
+  for (let idx = 0; idx < findings.length; ++idx) {
     if (assignments[idx] === 0) {
       let rowSum = 0,
         colSum = 0,
         sizeSum = 0,
         scoreSum = 0,
         count = 0;
-      for (let jdx = idx; jdx < dets.length; ++jdx) {
-        if (getOverlap(dets[idx], dets[jdx]) > minOverlap) {
+      for (let jdx = idx; jdx < findings.length; ++jdx) {
+        if (getOverlap(findings[idx], findings[jdx]) > minOverlap) {
           assignments[jdx] = 1;
-          rowSum += dets[jdx].row;
-          colSum += dets[jdx].col;
-          sizeSum += dets[jdx].size;
-          scoreSum += dets[jdx].score;
+          rowSum += findings[jdx].row;
+          colSum += findings[jdx].col;
+          sizeSum += findings[jdx].size;
+          scoreSum += findings[jdx].score;
           count += 1;
         }
       }
@@ -192,13 +192,13 @@ export function clusterDetections(dets: PicoDet[], minOverlap: number): PicoDet[
 
 export function instantiateDetectionMemory(size: number): UpdateMemory {
   let slot = 0;
-  const memory: PicoDet[][] = [];
+  const memory: Finding[][] = [];
   for (let idx = 0; idx < size; idx++) memory.push([]);
 
-  return (dets) => {
-    memory[slot] = dets.slice();
+  return (findings) => {
+    memory[slot] = findings.slice();
     slot = (slot + 1) % size;
-    const all: PicoDet[] = [];
+    const all: Finding[] = [];
     for (let idx = 0; idx < size; idx++) for (let jdx = 0; jdx < memory[idx].length; jdx++) all.push(memory[idx][jdx]);
     return all;
   };
