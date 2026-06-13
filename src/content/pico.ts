@@ -76,7 +76,7 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
         idx =
           2 * idx +
           (pixels[
-            ((row + codes[root + 4 * idx + 0] * scale) >> 8) * ldim + ((col + codes[root + 4 * idx + 1] * scale) >> 8)
+            ((row + codes[root + 4 * idx] * scale) >> 8) * ldim + ((col + codes[root + 4 * idx + 1] * scale) >> 8)
           ] <=
           pixels[
             ((row + codes[root + 4 * idx + 2] * scale) >> 8) * ldim + ((col + codes[root + 4 * idx + 3] * scale) >> 8)
