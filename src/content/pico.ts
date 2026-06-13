@@ -7,7 +7,13 @@
  */
 
 /** Function that classifies a region (row, col, scale) as face or non-face. */
-export type ClassifyRegion = (row: number, col: number, scale: number, pixels: Int8Array, ldim: number) => number;
+export type ClassifyRegion = (
+  row: number,
+  col: number,
+  scale: number,
+  pixels: Int8Array,
+  leadingDimension: number,
+) => number;
 
 /** Grayscale image used as input for pico face detection. */
 export interface PicoImage {
@@ -17,8 +23,15 @@ export interface PicoImage {
   height: number;
   /** Number of columns (width) in the image. */
   width: number;
-  /** Stride (number of columns including any padding). */
-  ldim: number;
+  /**
+   * Stride (number of columns including any padding).
+   * @deprecated Legacy pico.js concept from OpenCV-style row-aligned buffers.
+   * Always equals `width` in this codebase — kept only because the original
+   * pico.js algorithm accepts it as a parameter. The formula
+   * `pixels[row * leadingDimension + col]` works when
+   * `leadingDimension >= width`.
+   */
+  leadingDimension: number;
 }
 
 /** Sliding-window parameters for the cascade classifier. */
@@ -77,7 +90,7 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
   const predictions = new Float32Array(predictionList);
   const thresholds = new Float32Array(thresholdList);
 
-  return (row, col, scale, pixels, ldim) => {
+  return (row, col, scale, pixels, leadingDimension) => {
     row = 256 * row;
     col = 256 * col;
     let root = 0;
@@ -88,10 +101,12 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
         idx =
           2 * idx +
           (pixels[
-            ((row + codes[root + 4 * idx] * scale) >> 8) * ldim + ((col + codes[root + 4 * idx + 1] * scale) >> 8)
+            ((row + codes[root + 4 * idx] * scale) >> 8) * leadingDimension +
+              ((col + codes[root + 4 * idx + 1] * scale) >> 8)
           ] <=
           pixels[
-            ((row + codes[root + 4 * idx + 2] * scale) >> 8) * ldim + ((col + codes[root + 4 * idx + 3] * scale) >> 8)
+            ((row + codes[root + 4 * idx + 2] * scale) >> 8) * leadingDimension +
+              ((col + codes[root + 4 * idx + 3] * scale) >> 8)
           ]
             ? 1
             : 0);
@@ -105,7 +120,7 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
 }
 
 export function runCascade(image: PicoImage, classifyRegion: ClassifyRegion, params: CascadeParams): PicoDet[] {
-  const { pixels, height, width, ldim } = image;
+  const { pixels, height, width, leadingDimension } = image;
   const { shiftFactor, minSize, maxSize, scaleFactor } = params;
   let scale = minSize;
   const dets: PicoDet[] = [];
@@ -114,7 +129,7 @@ export function runCascade(image: PicoImage, classifyRegion: ClassifyRegion, par
     const offset = (scale / 2 + 1) >> 0;
     for (let row = offset; row <= height - offset; row += step) {
       for (let col = offset; col <= width - offset; col += step) {
-        const score = classifyRegion(row, col, scale, pixels, ldim);
+        const score = classifyRegion(row, col, scale, pixels, leadingDimension);
         if (score > 0.0) {
           dets.push({ row, col, size: scale, score });
         }
@@ -224,5 +239,5 @@ export function grayscale(imgData: ImageData, width: number, height: number): Pi
     const offset = idx * 4;
     pixels[idx] = (data[offset] * 77 + data[offset + 1] * 151 + data[offset + 2] * 28 + 128) >> 8;
   }
-  return { pixels, height, width, ldim: width };
+  return { pixels, height, width, leadingDimension: width };
 }
