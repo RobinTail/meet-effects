@@ -140,19 +140,27 @@ export function runCascade(image: PicoImage, classifyRegion: ClassifyRegion, par
  */
 const CLUSTER_Q_MODE: "sum" | "mean" = "mean";
 
-export function clusterDetections(dets: PicoDet[], iouthreshold: number): PicoDet[] {
+/**
+ * Overlap ratio (IoU) for two square pico detections.
+ * Both are represented as (row, col, size) where size is the square side length.
+ * @returns number - Ratio in [0, 1] — 0 (none) to 1 (identical).
+ */
+function getOverlap(detA: PicoDet, detB: PicoDet): number {
+  const overRow = Math.max(
+    0,
+    Math.min(detA.row + detA.size / 2, detB.row + detB.size / 2) -
+      Math.max(detA.row - detA.size / 2, detB.row - detB.size / 2),
+  );
+  const overCol = Math.max(
+    0,
+    Math.min(detA.col + detA.size / 2, detB.col + detB.size / 2) -
+      Math.max(detA.col - detA.size / 2, detB.col - detB.size / 2),
+  );
+  return (overRow * overCol) / (detA.size * detA.size + detB.size * detB.size - overRow * overCol);
+}
+
+export function clusterDetections(dets: PicoDet[], minOverlap: number): PicoDet[] {
   dets = dets.sort((detA, detB) => detB.score - detA.score);
-  function iou(d1: PicoDet, d2: PicoDet): number {
-    const overRow = Math.max(
-      0,
-      Math.min(d1.row + d1.size / 2, d2.row + d2.size / 2) - Math.max(d1.row - d1.size / 2, d2.row - d2.size / 2),
-    );
-    const overCol = Math.max(
-      0,
-      Math.min(d1.col + d1.size / 2, d2.col + d2.size / 2) - Math.max(d1.col - d1.size / 2, d2.col - d2.size / 2),
-    );
-    return (overRow * overCol) / (d1.size * d1.size + d2.size * d2.size - overRow * overCol);
-  }
   const assignments = new Array(dets.length).fill(0);
   const clusters: PicoDet[] = [];
   for (let idx = 0; idx < dets.length; ++idx) {
@@ -163,7 +171,7 @@ export function clusterDetections(dets: PicoDet[], iouthreshold: number): PicoDe
         scoreSum = 0,
         count = 0;
       for (let jdx = idx; jdx < dets.length; ++jdx) {
-        if (iou(dets[idx], dets[jdx]) > iouthreshold) {
+        if (getOverlap(dets[idx], dets[jdx]) > minOverlap) {
           assignments[jdx] = 1;
           rowSum += dets[jdx].row;
           colSum += dets[jdx].col;

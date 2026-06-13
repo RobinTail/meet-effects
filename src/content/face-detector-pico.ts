@@ -16,8 +16,8 @@ const MEMORY_SIZE = 5;
 const ACQUIRE_SCORE = 1.2;
 // once acquired, keep the face while average score stays above this (hysteresis)
 const HOLD_SCORE = 0.5;
-// detections with IoU above this are merged into the same cluster during non-max suppression
-const CLUSTER_IOU_THRESHOLD = 0.2;
+// detections with overlap above this are merged into the same cluster during non-max suppression
+const MIN_OVERLAP = 0.2;
 // longest dimension (px) of the downscaled detection image fed to pico; smaller = faster but less accurate
 const DETECT_MAX_DIM = 320;
 // pico sliding-window params — see https://nenadmarkus.com/p/picojs-intro/
@@ -110,7 +110,7 @@ export class PicoDetector implements Detector {
 
     const { dets, dimScale } = raw;
     const accumulated = this.updateMemory(dets);
-    const clustered = clusterDetections(accumulated, CLUSTER_IOU_THRESHOLD);
+    const clustered = clusterDetections(accumulated, MIN_OVERLAP);
     const threshold = currentlyHasFace ? HOLD_SCORE : ACQUIRE_SCORE;
     const best = clustered.find((det) => det.score >= threshold);
     if (!best) return null;
