@@ -41,11 +41,9 @@ onEl("debug", "change", () => {
 });
 
 onEl("enabled", "change", applyControls);
-for (const feature of FEATURES) {
-  onEl("opt-" + feature, "change", applyControls);
-}
 onEl("debug", "change", applyControls);
 for (const feature of FEATURES) {
+  onEl("opt-" + feature, "change", applyControls);
   onEl("size-" + feature, "input", applyControls);
 }
 onEl("fps", "input", applyControls);
