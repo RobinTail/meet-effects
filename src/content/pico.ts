@@ -36,16 +36,10 @@ export interface PicoDet {
 export function unpackCascade(bytes: Int8Array): ClassifyRegion {
   const view = new DataView(new ArrayBuffer(4));
   let pos = 8;
-  view.setUint8(0, bytes[pos + 0]);
-  view.setUint8(1, bytes[pos + 1]);
-  view.setUint8(2, bytes[pos + 2]);
-  view.setUint8(3, bytes[pos + 3]);
+  for (let idx = 0; idx < 4; ++idx) view.setUint8(idx, bytes[pos + idx]);
   const treeDepth = view.getInt32(0, true);
   pos += 4;
-  view.setUint8(0, bytes[pos + 0]);
-  view.setUint8(1, bytes[pos + 1]);
-  view.setUint8(2, bytes[pos + 2]);
-  view.setUint8(3, bytes[pos + 3]);
+  for (let idx = 0; idx < 4; ++idx) view.setUint8(idx, bytes[pos + idx]);
   const nTrees = view.getInt32(0, true);
   pos += 4;
   const codeList: number[] = [];
@@ -59,17 +53,11 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
     }
     pos += 4 * leafCount - 4;
     for (let idx = 0; idx < leafCount; ++idx) {
-      view.setUint8(0, bytes[pos + 0]);
-      view.setUint8(1, bytes[pos + 1]);
-      view.setUint8(2, bytes[pos + 2]);
-      view.setUint8(3, bytes[pos + 3]);
+      for (let idx = 0; idx < 4; ++idx) view.setUint8(idx, bytes[pos + idx]);
       predictionList.push(view.getFloat32(0, true));
       pos += 4;
     }
-    view.setUint8(0, bytes[pos + 0]);
-    view.setUint8(1, bytes[pos + 1]);
-    view.setUint8(2, bytes[pos + 2]);
-    view.setUint8(3, bytes[pos + 3]);
+    for (let idx = 0; idx < 4; ++idx) view.setUint8(idx, bytes[pos + idx]);
     thresholdList.push(view.getFloat32(0, true));
     pos += 4;
   }
