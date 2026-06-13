@@ -35,36 +35,37 @@ export class NativeDetector implements Detector {
         width: face.boundingBox.width,
         height: face.boundingBox.height,
       };
-      if (face.landmarks) {
-        const eyes = face.landmarks
-          .filter((lm) => lm.type === "eye")
-          .sort((one, other) => (one.locations[0]?.x ?? 0) - (other.locations[0]?.x ?? 0));
-        if (eyes.length >= 2) {
-          result.eyeLX = eyes[0].locations[0]?.x;
-          result.eyeLY = eyes[0].locations[0]?.y;
-          result.eyeRX = eyes[1].locations[0]?.x;
-          result.eyeRY = eyes[1].locations[0]?.y;
-        }
-
-        const mouth = face.landmarks.find((lm) => lm.type === "mouth");
-        if (mouth?.locations?.[0]) {
-          result.mouthX = mouth.locations[0].x;
-          result.mouthY = mouth.locations[0].y;
-        }
-
-        const nose = face.landmarks.find((lm) => lm.type === "nose");
-        if (nose?.locations?.[0]) {
-          result.noseX = nose.locations[0].x;
-          result.noseY = nose.locations[0].y;
-        } else if (result.eyeLY !== undefined && result.eyeRY !== undefined && result.mouthY !== undefined) {
-          result.noseX = result.mouthX;
-          result.noseY = ((result.eyeLY + result.eyeRY) / 2 + result.mouthY) / 2;
-        }
-      }
-
+      if (face.landmarks) this.applyLandmarks(result, face.landmarks);
       return result;
     } catch {
       return null;
+    }
+  }
+
+  private applyLandmarks(result: FaceBox, landmarks: Landmark[]) {
+    const eyes = landmarks
+      .filter((lm) => lm.type === "eye")
+      .sort((one, other) => (one.locations[0]?.x ?? 0) - (other.locations[0]?.x ?? 0));
+    if (eyes.length >= 2) {
+      result.eyeLX = eyes[0].locations[0]?.x;
+      result.eyeLY = eyes[0].locations[0]?.y;
+      result.eyeRX = eyes[1].locations[0]?.x;
+      result.eyeRY = eyes[1].locations[0]?.y;
+    }
+
+    const mouth = landmarks.find((lm) => lm.type === "mouth");
+    if (mouth?.locations[0]) {
+      result.mouthX = mouth.locations[0].x;
+      result.mouthY = mouth.locations[0].y;
+    }
+
+    const nose = landmarks.find((lm) => lm.type === "nose");
+    if (nose?.locations[0]) {
+      result.noseX = nose.locations[0].x;
+      result.noseY = nose.locations[0].y;
+    } else if (result.eyeLY !== undefined && result.eyeRY !== undefined && result.mouthY !== undefined) {
+      result.noseX = result.mouthX;
+      result.noseY = ((result.eyeLY + result.eyeRY) / 2 + result.mouthY) / 2;
     }
   }
 }

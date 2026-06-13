@@ -8,9 +8,14 @@ interface FaceDetector {
   detect(video: HTMLVideoElement): Promise<NativeDetectedFace[]>;
 }
 
+interface Landmark {
+  type: string;
+  locations: { x: number; y: number }[];
+}
+
 interface NativeDetectedFace {
   boundingBox: { x: number; y: number; width: number; height: number };
-  landmarks?: { type: string; locations: { x: number; y: number }[] }[];
+  landmarks?: Landmark[];
 }
 
 interface FaceDetectorOptions {
