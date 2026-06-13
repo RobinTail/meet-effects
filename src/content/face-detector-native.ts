@@ -47,7 +47,7 @@ export class NativeDetector implements Detector {
         height: face.boundingBox.height,
       };
       if (face.landmarks) this.applyLandmarks(result, face.landmarks);
-      if (this.prev) {
+      if (this.prev && this.smoothing < 1) {
         for (const key of Object.keys(result) as (keyof FaceBox)[]) {
           const val = result[key];
           const prevVal = this.prev[key];
