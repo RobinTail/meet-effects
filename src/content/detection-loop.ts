@@ -100,6 +100,7 @@ export class DetectionLoop {
     if (!video.videoWidth || !video.videoHeight) return;
 
     const result = await this.detector.detect(video, this.state.debugCanvas, this.state.face !== null);
+    if (!this.running) return;
     if (!result) {
       if (this.state.face && this.settings.debug) console.log(`${APP_TITLE}: face lost`);
       this.state.face = null;
