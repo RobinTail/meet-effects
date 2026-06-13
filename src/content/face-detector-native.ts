@@ -23,7 +23,7 @@ export class NativeDetector implements Detector {
     }
   }
 
-  async detect(video: HTMLVideoElement, _debugCanvas?: HTMLCanvasElement): Promise<FaceBox | null> {
+  async detect(video: HTMLVideoElement): Promise<FaceBox | null> {
     if (!this.detector) return null;
     try {
       const faces = await this.detector.detect(video);

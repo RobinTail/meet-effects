@@ -7,9 +7,7 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   eslintPluginPrettierRecommended,
   {
-    rules: {
-      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-    },
+    rules: {},
   },
   {
     ignores: ["dist/"],
