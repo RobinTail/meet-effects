@@ -49,10 +49,10 @@ export interface Finding {
 export function unpackCascade(bytes: Int8Array): ClassifyRegion {
   const view = new DataView(new ArrayBuffer(4));
   let pos = 8;
-  for (let idx = 0; idx < 4; ++idx) view.setUint8(idx, bytes[pos + idx]);
+  for (let byte = 0; byte < 4; ++byte) view.setUint8(byte, bytes[pos + byte]);
   const treeDepth = view.getInt32(0, true);
   pos += 4;
-  for (let idx = 0; idx < 4; ++idx) view.setUint8(idx, bytes[pos + idx]);
+  for (let byte = 0; byte < 4; ++byte) view.setUint8(byte, bytes[pos + byte]);
   const nTrees = view.getInt32(0, true);
   pos += 4;
   const codeList: number[] = [];
@@ -61,16 +61,16 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
   const leafCount = Math.pow(2, treeDepth);
   for (let tree = 0; tree < nTrees; ++tree) {
     codeList.push(0, 0, 0, 0);
-    for (let idx = 0; idx < 4 * leafCount - 4; ++idx) {
-      codeList.push(bytes[pos + idx]);
+    for (let byte = 0; byte < 4 * leafCount - 4; ++byte) {
+      codeList.push(bytes[pos + byte]);
     }
     pos += 4 * leafCount - 4;
-    for (let idx = 0; idx < leafCount; ++idx) {
-      for (let idx = 0; idx < 4; ++idx) view.setUint8(idx, bytes[pos + idx]);
+    for (let leaf = 0; leaf < leafCount; ++leaf) {
+      for (let byte = 0; byte < 4; ++byte) view.setUint8(byte, bytes[pos + byte]);
       predictionList.push(view.getFloat32(0, true));
       pos += 4;
     }
-    for (let idx = 0; idx < 4; ++idx) view.setUint8(idx, bytes[pos + idx]);
+    for (let byte = 0; byte < 4; ++byte) view.setUint8(byte, bytes[pos + byte]);
     thresholdList.push(view.getFloat32(0, true));
     pos += 4;
   }
