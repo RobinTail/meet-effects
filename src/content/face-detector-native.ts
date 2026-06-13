@@ -12,6 +12,14 @@ export class NativeDetector implements Detector {
 
   readonly name = "native";
   private detector: FaceDetector | null = null;
+  private prev: FaceBox | null = null;
+  /**
+   * Exponential moving average factor for temporal smoothing of face
+   * detections. Range (0, 1]: 1 = no smoothing (raw passthrough), 0.5 =
+   * equal blend of current and previous frame, 0.3 = heavy smoothing
+   * (more lag but very stable).
+   */
+  private readonly smoothing = 0.5;
 
   async init(): Promise<boolean> {
     if (!FaceDetector) return false;
@@ -27,7 +35,10 @@ export class NativeDetector implements Detector {
     if (!this.detector) return null;
     try {
       const faces = await this.detector.detect(video);
-      if (!faces || faces.length === 0) return null;
+      if (!faces || faces.length === 0) {
+        this.prev = null;
+        return null;
+      }
       const face = faces[0];
       const result: FaceBox = {
         x: face.boundingBox.x,
@@ -36,8 +47,18 @@ export class NativeDetector implements Detector {
         height: face.boundingBox.height,
       };
       if (face.landmarks) this.applyLandmarks(result, face.landmarks);
+      if (this.prev) {
+        for (const key of Object.keys(result) as (keyof FaceBox)[]) {
+          const val = result[key];
+          const prevVal = this.prev[key];
+          if (typeof val === "number" && typeof prevVal === "number")
+            (result[key] as number) = this.smoothing * val + (1 - this.smoothing) * prevVal;
+        }
+      }
+      this.prev = { ...result };
       return result;
     } catch {
+      this.prev = null;
       return null;
     }
   }
