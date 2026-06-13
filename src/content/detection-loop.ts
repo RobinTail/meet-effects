@@ -10,13 +10,13 @@ import { renderDebugBox } from "./debug-renderer";
 import { DEFAULT_SETTINGS } from "../shared/types";
 
 export class DetectionLoop {
-  private state: OverlayState;
+  private readonly state: OverlayState;
   private running = false;
   private lastDetection = 0;
   private minInterval: number;
   private animationId: number | null = null;
   private detector: Detector;
-  private settings: Settings;
+  private readonly settings: Settings;
 
   get detectorName(): string {
     return this.detector.name;

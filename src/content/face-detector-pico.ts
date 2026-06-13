@@ -27,7 +27,7 @@ const SCALE_FACTOR = 1.1; // multiplier between successive window scales
 
 export class PicoDetector implements Detector {
   readonly name = "pico";
-  private updateMemory: (dets: PicoDet[]) => PicoDet[];
+  private readonly updateMemory: (dets: PicoDet[]) => PicoDet[];
 
   private static classifyRegion: ClassifyRegion | null = null;
   private static cascadeLoaded = false;
