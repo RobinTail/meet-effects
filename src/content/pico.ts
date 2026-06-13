@@ -14,9 +14,9 @@ export interface PicoImage {
   /** Luma (brightness) values, one byte per pixel, row-major order. */
   pixels: Int8Array;
   /** Number of rows (height) in the image. */
-  nrows: number;
+  height: number;
   /** Number of columns (width) in the image. */
-  ncols: number;
+  width: number;
   /** Stride (number of columns including any padding). */
   ldim: number;
 }
@@ -105,15 +105,15 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
 }
 
 export function runCascade(image: PicoImage, classifyRegion: ClassifyRegion, params: CascadeParams): PicoDet[] {
-  const { pixels, nrows, ncols, ldim } = image;
+  const { pixels, height, width, ldim } = image;
   const { shiftFactor, minSize, maxSize, scaleFactor } = params;
   let scale = minSize;
   const dets: PicoDet[] = [];
   while (scale <= maxSize) {
     const step = Math.max(shiftFactor * scale, 1) >> 0;
     const offset = (scale / 2 + 1) >> 0;
-    for (let row = offset; row <= nrows - offset; row += step) {
-      for (let col = offset; col <= ncols - offset; col += step) {
+    for (let row = offset; row <= height - offset; row += step) {
+      for (let col = offset; col <= width - offset; col += step) {
         const score = classifyRegion(row, col, scale, pixels, ldim);
         if (score > 0.0) {
           dets.push({ row, col, size: scale, score });
@@ -199,13 +199,13 @@ export function instantiateDetectionMemory(size: number): (dets: PicoDet[]) => P
  * Renders the grayscale pixel data from a `PicoImage` onto a canvas.
  */
 export function renderPicoImage(img: PicoImage, canvas: HTMLCanvasElement): void {
-  const { pixels, nrows, ncols } = img;
-  canvas.width = ncols;
-  canvas.height = nrows;
+  const { pixels, height, width } = img;
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext("2d")!;
-  const imageData = ctx.createImageData(ncols, nrows);
+  const imageData = ctx.createImageData(width, height);
   const data = imageData.data;
-  for (let idx = 0; idx < nrows * ncols; idx++) {
+  for (let idx = 0; idx < height * width; idx++) {
     const pixel = pixels[idx] & 0xff;
     const offset = idx * 4;
     data[offset] = pixel;
@@ -224,5 +224,5 @@ export function grayscale(imgData: ImageData, width: number, height: number): Pi
     const offset = idx * 4;
     pixels[idx] = (data[offset] * 77 + data[offset + 1] * 151 + data[offset + 2] * 28 + 128) >> 8;
   }
-  return { pixels, nrows: height, ncols: width, ldim: width };
+  return { pixels, height, width, ldim: width };
 }
