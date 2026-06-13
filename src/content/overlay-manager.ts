@@ -66,14 +66,6 @@ export class OverlayManager {
     this.states.delete(video);
   }
 
-  getState(video: HTMLVideoElement): OverlayState | undefined {
-    return this.states.get(video);
-  }
-
-  getAllStates(): OverlayState[] {
-    return Array.from(this.states.values());
-  }
-
   private findState(element: Element): OverlayState | undefined {
     for (const state of this.states.values()) {
       if (state.video === element) return state;

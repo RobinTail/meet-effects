@@ -51,10 +51,8 @@ function drawSideCurtain(
 
   for (let idx = 0; idx < N_STRIPES; idx++) {
     const sx = x + idx * stripeW;
-    const color = idx % 2 === 0 ? STRIPE_RED : STRIPE_WHITE;
-    ctx.fillStyle = color;
+    ctx.fillStyle = idx % 2 === 0 ? STRIPE_RED : STRIPE_WHITE;
     ctx.fillRect(sx, y, stripeW, height);
-
     ctx.fillStyle = FOLD_SHADOW;
     if (mirror) {
       ctx.fillRect(sx, y, shadowW, height);
@@ -86,10 +84,8 @@ function drawTopValance(
 
   for (let idx = 0; idx < N_STRIPES; idx++) {
     const sx = innerX + idx * stripeW;
-    const color = idx % 2 === 0 ? STRIPE_RED : STRIPE_WHITE;
-    ctx.fillStyle = color;
+    ctx.fillStyle = idx % 2 === 0 ? STRIPE_RED : STRIPE_WHITE;
     ctx.fillRect(sx, y, stripeW, height);
-
     ctx.fillStyle = FOLD_SHADOW;
     ctx.fillRect(sx + stripeW - shadowW, y, shadowW, height);
   }
