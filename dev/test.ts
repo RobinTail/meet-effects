@@ -20,13 +20,13 @@ let loop: DetectionLoop | null = null;
 let state: OverlayState | null = null;
 
 function applyControls() {
-  const s = readControls();
-  if (s.enabled) {
+  const settings = readControls();
+  if (settings.enabled) {
     loop?.start();
   } else {
     loop?.stop();
   }
-  loop?.applySettings(s);
+  loop?.applySettings(settings);
 }
 
 function onEl(id: string, event: string, fn: () => void) {
@@ -41,12 +41,12 @@ onEl("debug", "change", () => {
 });
 
 onEl("enabled", "change", applyControls);
-for (const f of FEATURES) {
-  onEl("opt-" + f, "change", applyControls);
+for (const feature of FEATURES) {
+  onEl("opt-" + feature, "change", applyControls);
 }
 onEl("debug", "change", applyControls);
-for (const f of FEATURES) {
-  onEl("size-" + f, "input", applyControls);
+for (const feature of FEATURES) {
+  onEl("size-" + feature, "input", applyControls);
 }
 onEl("fps", "input", applyControls);
 
@@ -89,8 +89,8 @@ async function startVideo(src: MediaProvider | string, mirrored: boolean) {
       requestAnimationFrame(fpsCounter);
     }
     requestAnimationFrame(fpsCounter);
-  } catch (e) {
-    statsEl.innerHTML = `<span class="err">${(e as Error).message}</span>`;
+  } catch (err) {
+    statsEl.innerHTML = `<span class="err">${(err as Error).message}</span>`;
   }
 }
 

@@ -13,18 +13,18 @@ const TILT_SHIFT = 2;
 export function renderCrown(
   ctx: CanvasRenderingContext2D,
   box: FaceBox,
-  w: number,
+  canvasW: number,
   scaleX: number,
   scaleY: number,
   mirrored: boolean,
   crownSize: number,
 ) {
-  const cx = mirrored ? w - (box.x + box.width / 2) * scaleX : (box.x + box.width / 2) * scaleX;
+  const cx = mirrored ? canvasW - (box.x + box.width / 2) * scaleX : (box.x + box.width / 2) * scaleX;
   const topY = box.y * scaleY;
   const cw = box.width * scaleX;
   const ch = box.height * crownSize * scaleY;
 
-  const { angle } = getEyeInfo(box, w, scaleX, scaleY, mirrored);
+  const { angle } = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored);
 
   ctx.save();
 
@@ -80,21 +80,21 @@ export function renderCrown(
   ctx.stroke();
 
   // jewels
-  for (let i = 0; i < JEWEL_X.length; i++) {
-    const px = left + JEWEL_X[i] * cw;
-    const py = top + ch * JEWEL_Y[i];
-    const r = cw * JEWEL_R[i];
+  for (let idx = 0; idx < JEWEL_X.length; idx++) {
+    const px = left + JEWEL_X[idx] * cw;
+    const py = top + ch * JEWEL_Y[idx];
+    const radius = cw * JEWEL_R[idx];
 
     ctx.beginPath();
-    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.arc(px, py, radius, 0, Math.PI * 2);
     ctx.fillStyle = "#FF0044";
     ctx.fill();
     ctx.strokeStyle = "#FF69B4";
-    ctx.lineWidth = Math.max(1, r * 0.15);
+    ctx.lineWidth = Math.max(1, radius * 0.15);
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(px - r * 0.25, py - r * 0.25, r * 0.3, 0, Math.PI * 2);
+    ctx.arc(px - radius * 0.25, py - radius * 0.25, radius * 0.3, 0, Math.PI * 2);
     ctx.fillStyle = "rgba(255,255,255,0.4)";
     ctx.fill();
   }

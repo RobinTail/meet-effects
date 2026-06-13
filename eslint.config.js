@@ -7,7 +7,9 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   eslintPluginPrettierRecommended,
   {
-    rules: {},
+    rules: {
+      "id-length": ["error", { min: 2, exceptions: ["x", "y"] }],
+    },
   },
   {
     ignores: ["dist/"],

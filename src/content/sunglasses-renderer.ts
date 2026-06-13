@@ -4,13 +4,13 @@ import { getEyeInfo } from "./eye-angle";
 export function renderSunglasses(
   ctx: CanvasRenderingContext2D,
   box: FaceBox,
-  w: number,
+  canvasW: number,
   scaleX: number,
   scaleY: number,
   mirrored: boolean,
   sunglassesSize: number,
 ) {
-  const { midX, midY, angle, halfDist } = getEyeInfo(box, w, scaleX, scaleY, mirrored);
+  const { midX, midY, angle, halfDist } = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored);
 
   const lensW = box.width * sunglassesSize * 0.5 * scaleX;
   const lensH = lensW * 0.5;

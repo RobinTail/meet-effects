@@ -15,7 +15,7 @@ export interface EyeInfo {
   halfDist: number;
 }
 
-export function getEyeInfo(box: FaceBox, w: number, scaleX: number, scaleY: number, mirrored: boolean): EyeInfo {
+export function getEyeInfo(box: FaceBox, canvasW: number, scaleX: number, scaleY: number, mirrored: boolean): EyeInfo {
   const eyeLX = box.eyeLX ?? box.x + box.width * EYE_CX;
   const eyeLY = box.eyeLY ?? box.y + box.height * EYE_CY;
   const eyeRX = box.eyeRX ?? box.x + box.width * (EYE_CX + EYE_SPACING);
@@ -29,9 +29,9 @@ export function getEyeInfo(box: FaceBox, w: number, scaleX: number, scaleY: numb
   const faceAngle = Math.atan2(ry - ly, rx - lx);
   const angle = mirrored ? -faceAngle : faceAngle;
 
-  const cx = mirrored ? w - lx : lx;
+  const cx = mirrored ? canvasW - lx : lx;
   const cy = ly;
-  const cx2 = mirrored ? w - rx : rx;
+  const cx2 = mirrored ? canvasW - rx : rx;
   const cy2 = ry;
 
   const midX = (cx + cx2) / 2;

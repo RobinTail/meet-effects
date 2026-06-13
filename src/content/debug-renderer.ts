@@ -3,12 +3,12 @@ import type { FaceBox } from "../shared/types";
 export function renderDebugBox(
   ctx: CanvasRenderingContext2D,
   box: FaceBox,
-  w: number,
+  canvasW: number,
   scaleX: number,
   scaleY: number,
   mirrored: boolean,
 ) {
-  const dx = mirrored ? w - (box.x + box.width) * scaleX : box.x * scaleX;
+  const dx = mirrored ? canvasW - (box.x + box.width) * scaleX : box.x * scaleX;
 
   ctx.strokeStyle = "#ff4444";
   ctx.lineWidth = 3;

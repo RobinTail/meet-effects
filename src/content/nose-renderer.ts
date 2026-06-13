@@ -6,7 +6,7 @@ const NOSE_CY = 0.6;
 export function renderNose(
   ctx: CanvasRenderingContext2D,
   box: FaceBox,
-  w: number,
+  canvasW: number,
   scaleX: number,
   scaleY: number,
   mirrored: boolean,
@@ -16,7 +16,7 @@ export function renderNose(
   const noseY = box.noseY != null ? box.noseY : box.y + box.height * NOSE_CY;
   const x = noseX * scaleX;
   const y = noseY * scaleY;
-  const cx = mirrored ? w - x : x;
+  const cx = mirrored ? canvasW - x : x;
   const cy = y;
   const noseRadius = box.height * noseSize * scaleY;
 

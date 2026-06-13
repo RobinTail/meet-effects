@@ -13,81 +13,95 @@ const N_STRIPES = 7;
 const FOLD_SHADOW_FRACTION = 0.25;
 const SCALLOP_RADIUS = 10;
 
-function clamp(v: number, lo: number, hi: number): number {
-  return v < lo ? lo : v > hi ? hi : v;
+function clamp(val: number, lo: number, hi: number): number {
+  return val < lo ? lo : val > hi ? hi : val;
 }
 
-function drawScallopClip(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+function drawScallopClip(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
   ctx.beginPath();
   ctx.moveTo(x, y);
-  ctx.lineTo(x + w, y);
-  ctx.lineTo(x + w, y + h);
+  ctx.lineTo(x + width, y);
+  ctx.lineTo(x + width, y + height);
 
-  const sw = SCALLOP_RADIUS * 2;
-  const n = Math.ceil(w / sw);
-  for (let i = n - 1; i >= 0; i--) {
-    const cx = x + i * sw + SCALLOP_RADIUS;
-    ctx.arc(cx, y + h, SCALLOP_RADIUS, 0, Math.PI, false);
+  const scallopW = SCALLOP_RADIUS * 2;
+  const count = Math.ceil(width / scallopW);
+  for (let idx = count - 1; idx >= 0; idx--) {
+    const cx = x + idx * scallopW + SCALLOP_RADIUS;
+    ctx.arc(cx, y + height, SCALLOP_RADIUS, 0, Math.PI, false);
   }
 
   ctx.closePath();
 }
 
-function drawSideCurtain(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, mirror: boolean) {
+function drawSideCurtain(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  mirror: boolean,
+) {
   ctx.save();
   ctx.beginPath();
-  ctx.rect(x, y, w, h);
+  ctx.rect(x, y, width, height);
   ctx.clip();
 
-  const stripeW = w / N_STRIPES;
+  const stripeW = width / N_STRIPES;
   const shadowW = stripeW * FOLD_SHADOW_FRACTION;
 
-  for (let i = 0; i < N_STRIPES; i++) {
-    const sx = x + i * stripeW;
-    const color = i % 2 === 0 ? STRIPE_RED : STRIPE_WHITE;
+  for (let idx = 0; idx < N_STRIPES; idx++) {
+    const sx = x + idx * stripeW;
+    const color = idx % 2 === 0 ? STRIPE_RED : STRIPE_WHITE;
     ctx.fillStyle = color;
-    ctx.fillRect(sx, y, stripeW, h);
+    ctx.fillRect(sx, y, stripeW, height);
 
     ctx.fillStyle = FOLD_SHADOW;
     if (mirror) {
-      ctx.fillRect(sx, y, shadowW, h);
+      ctx.fillRect(sx, y, shadowW, height);
     } else {
-      ctx.fillRect(sx + stripeW - shadowW, y, shadowW, h);
+      ctx.fillRect(sx + stripeW - shadowW, y, shadowW, height);
     }
   }
 
   ctx.restore();
 }
 
-function drawTopValance(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, sideW: number) {
-  const innerX = x + sideW;
-  const innerW = w - sideW * 2;
+function drawTopValance(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  sideWidth: number,
+) {
+  const innerX = x + sideWidth;
+  const innerW = width - sideWidth * 2;
 
   ctx.save();
-  drawScallopClip(ctx, innerX, y, innerW, h);
+  drawScallopClip(ctx, innerX, y, innerW, height);
   ctx.clip();
 
   const stripeW = innerW / N_STRIPES;
   const shadowW = stripeW * FOLD_SHADOW_FRACTION;
 
-  for (let i = 0; i < N_STRIPES; i++) {
-    const sx = innerX + i * stripeW;
-    const color = i % 2 === 0 ? STRIPE_RED : STRIPE_WHITE;
+  for (let idx = 0; idx < N_STRIPES; idx++) {
+    const sx = innerX + idx * stripeW;
+    const color = idx % 2 === 0 ? STRIPE_RED : STRIPE_WHITE;
     ctx.fillStyle = color;
-    ctx.fillRect(sx, y, stripeW, h);
+    ctx.fillRect(sx, y, stripeW, height);
 
     ctx.fillStyle = FOLD_SHADOW;
-    ctx.fillRect(sx + stripeW - shadowW, y, shadowW, h);
+    ctx.fillRect(sx + stripeW - shadowW, y, shadowW, height);
   }
 
   ctx.restore();
 }
 
-export function renderStripedCurtains(ctx: CanvasRenderingContext2D, w: number, h: number) {
-  const sideW = clamp(Math.round(w * SIDE_WIDTH_FRACTION), SIDE_WIDTH_MIN, SIDE_WIDTH_MAX);
-  const topH = clamp(Math.round(h * TOP_HEIGHT_FRACTION), TOP_HEIGHT_MIN, TOP_HEIGHT_MAX);
+export function renderStripedCurtains(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  const sideWidth = clamp(Math.round(width * SIDE_WIDTH_FRACTION), SIDE_WIDTH_MIN, SIDE_WIDTH_MAX);
+  const topHeight = clamp(Math.round(height * TOP_HEIGHT_FRACTION), TOP_HEIGHT_MIN, TOP_HEIGHT_MAX);
 
-  drawTopValance(ctx, 0, 0, w, topH, sideW);
-  drawSideCurtain(ctx, 0, 0, sideW, h, false);
-  drawSideCurtain(ctx, w - sideW, 0, sideW, h, true);
+  drawTopValance(ctx, 0, 0, width, topHeight, sideWidth);
+  drawSideCurtain(ctx, 0, 0, sideWidth, height, false);
+  drawSideCurtain(ctx, width - sideWidth, 0, sideWidth, height, true);
 }

@@ -8,7 +8,7 @@ let currentSettings: Settings = { ...DEFAULT_SETTINGS };
 function onTilesChange(states: OverlayState[]) {
   if (!currentSettings.enabled) return;
 
-  const live = new Set(states.map((s) => s.video));
+  const live = new Set(states.map((state) => state.video));
 
   for (const [video, loop] of loops) {
     if (!live.has(video)) {

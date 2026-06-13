@@ -24,19 +24,19 @@ function setSlider(id: string, val: number) {
 }
 
 chrome.storage.sync.get(null).then((data) => {
-  const s: Settings = { ...DEFAULT_SETTINGS, ...data };
-  setChecked("enabled", s.enabled);
-  for (const f of FEATURES) {
-    setChecked("opt-" + f, s.overlays[f]?.enabled ?? false);
-    const sliderId = "size-" + f;
-    const sliderVal = s.overlays[f]?.size;
+  const settings: Settings = { ...DEFAULT_SETTINGS, ...data };
+  setChecked("enabled", settings.enabled);
+  for (const feature of FEATURES) {
+    setChecked("opt-" + feature, settings.overlays[feature]?.enabled ?? false);
+    const sliderId = "size-" + feature;
+    const sliderVal = settings.overlays[feature]?.size;
     if (sliderVal != null) setSlider(sliderId, Math.round(sliderVal * 100));
   }
-  setChecked("debug", s.debug);
+  setChecked("debug", settings.debug);
   const fpsIn = el<HTMLInputElement>("fps");
   const fpsOut = el<HTMLOutputElement>("fpsVal");
-  if (fpsIn) fpsIn.value = String(s.fps);
-  if (fpsOut) fpsOut.textContent = String(s.fps);
+  if (fpsIn) fpsIn.value = String(settings.fps);
+  if (fpsOut) fpsOut.textContent = String(settings.fps);
 });
 
 saveBtn.addEventListener("click", async () => {

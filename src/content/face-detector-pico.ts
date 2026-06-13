@@ -44,9 +44,9 @@ async function loadCascade(): Promise<boolean> {
     sharedClassifyRegion = unpackCascade(bytes);
     cascadeLoaded = true;
     return true;
-  } catch (e) {
-    cascadeError = String(e);
-    console.error(`${APP_TITLE}: failed to load cascade`, e);
+  } catch (err) {
+    cascadeError = String(err);
+    console.error(`${APP_TITLE}: failed to load cascade`, err);
     return false;
   }
 }
@@ -112,15 +112,15 @@ export class PicoDetector implements Detector {
     const accumulated = this.updateMemory(dets);
     const clustered = clusterDetections(accumulated, CLUSTER_IOU_THRESHOLD);
     const threshold = currentlyHasFace ? HOLD_SCORE : ACQUIRE_SCORE;
-    const best = clustered.find((d) => d.q >= threshold);
+    const best = clustered.find((det) => det.score >= threshold);
     if (!best) return null;
 
     const invScale = 1 / dimScale;
     return {
-      x: (best.c - best.s / 2) * invScale,
-      y: (best.r - best.s / 2) * invScale,
-      width: best.s * invScale,
-      height: best.s * invScale,
+      x: (best.col - best.size / 2) * invScale,
+      y: (best.row - best.size / 2) * invScale,
+      width: best.size * invScale,
+      height: best.size * invScale,
     };
   }
 }

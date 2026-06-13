@@ -61,9 +61,9 @@ export class DetectionLoop {
   }
 
   private clearCanvas() {
-    const w = parseFloat(this.state.canvas.style.width) || this.state.canvas.width / devicePixelRatio;
-    const h = parseFloat(this.state.canvas.style.height) || this.state.canvas.height / devicePixelRatio;
-    this.state.ctx.clearRect(0, 0, w, h);
+    const width = parseFloat(this.state.canvas.style.width) || this.state.canvas.width / devicePixelRatio;
+    const height = parseFloat(this.state.canvas.style.height) || this.state.canvas.height / devicePixelRatio;
+    this.state.ctx.clearRect(0, 0, width, height);
   }
 
   private schedule() {
@@ -108,29 +108,29 @@ export class DetectionLoop {
 
   private render() {
     const { canvas, ctx, video, mirrored } = this.state;
-    const w = parseFloat(canvas.style.width) || canvas.width / devicePixelRatio;
-    const h = parseFloat(canvas.style.height) || canvas.height / devicePixelRatio;
+    const width = parseFloat(canvas.style.width) || canvas.width / devicePixelRatio;
+    const height = parseFloat(canvas.style.height) || canvas.height / devicePixelRatio;
 
     this.clearCanvas();
 
     if (this.settings.overlays["curtains"]?.enabled) {
-      renderStripedCurtains(ctx, w, h);
+      renderStripedCurtains(ctx, width, height);
     }
 
     if (!this.state.face) return;
 
-    const scaleX = w / video.videoWidth;
-    const scaleY = h / video.videoHeight;
+    const scaleX = width / video.videoWidth;
+    const scaleY = height / video.videoHeight;
 
     if (this.settings.overlays["crown"]?.enabled) {
-      renderCrown(ctx, this.state.face, w, scaleX, scaleY, mirrored, this.settings.overlays["crown"]?.size ?? 0.5);
+      renderCrown(ctx, this.state.face, width, scaleX, scaleY, mirrored, this.settings.overlays["crown"]?.size ?? 0.5);
     }
 
     if (this.settings.overlays["sunglasses"]?.enabled) {
       renderSunglasses(
         ctx,
         this.state.face,
-        w,
+        width,
         scaleX,
         scaleY,
         mirrored,
@@ -139,11 +139,11 @@ export class DetectionLoop {
     }
 
     if (this.settings.overlays["nose"]?.enabled) {
-      renderNose(ctx, this.state.face, w, scaleX, scaleY, mirrored, this.settings.overlays["nose"]?.size ?? 0.15);
+      renderNose(ctx, this.state.face, width, scaleX, scaleY, mirrored, this.settings.overlays["nose"]?.size ?? 0.15);
     }
 
     if (this.settings.debug) {
-      renderDebugBox(ctx, this.state.face, w, scaleX, scaleY, mirrored);
+      renderDebugBox(ctx, this.state.face, width, scaleX, scaleY, mirrored);
     }
   }
 }

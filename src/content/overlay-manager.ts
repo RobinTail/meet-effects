@@ -90,12 +90,12 @@ export class OverlayManager {
       requestAnimationFrame(() => this.syncCanvasSize(state));
       return;
     }
-    const w = rect.width;
-    const h = rect.height;
-    canvas.width = Math.round(w * devicePixelRatio);
-    canvas.height = Math.round(h * devicePixelRatio);
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${h}px`;
+    const width = rect.width;
+    const height = rect.height;
+    canvas.width = Math.round(width * devicePixelRatio);
+    canvas.height = Math.round(height * devicePixelRatio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
     ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
   }
 

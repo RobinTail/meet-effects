@@ -21,23 +21,23 @@ const SLIDERS: Partial<Record<Feature, SliderDef>> = {
   crown: { id: "size-crown", label: "Crown size", min: 20, max: 100, value: 50 },
 };
 
-function featCheckbox(f: Feature): string {
+function featCheckbox(feature: Feature): string {
   return `
     <label class="row">
-      <input type="checkbox" id="opt-${f}" checked />
-      ${FEATURE_LABELS[f]}
+      <input type="checkbox" id="opt-${feature}" checked />
+      ${FEATURE_LABELS[feature]}
     </label>`;
 }
 
-function featSlider(f: Feature): string {
-  const s = SLIDERS[f];
-  if (!s) return "";
+function featSlider(feature: Feature): string {
+  const slider = SLIDERS[feature];
+  if (!slider) return "";
   return `
     <label class="row">
-      ${s.label}
+      ${slider.label}
       <span class="range-wrap">
-        <input type="range" id="${s.id}" min="${s.min}" max="${s.max}" value="${s.value}" />
-        <output id="${s.id}Val">${s.value}%</output>
+        <input type="range" id="${slider.id}" min="${slider.min}" max="${slider.max}" value="${slider.value}" />
+        <output id="${slider.id}Val">${slider.value}%</output>
       </span>
     </label>`;
 }
@@ -54,8 +54,8 @@ export function controlsHTML(): string {
     <fieldset>
       <legend>Elements</legend>`;
 
-  for (const f of FEATURES) {
-    html += featCheckbox(f);
+  for (const feature of FEATURES) {
+    html += featCheckbox(feature);
   }
 
   html += `</fieldset>
@@ -65,8 +65,8 @@ export function controlsHTML(): string {
       Debug mode
     </label>`;
 
-  for (const f of FEATURES) {
-    html += featSlider(f);
+  for (const feature of FEATURES) {
+    html += featSlider(feature);
   }
 
   html += `
@@ -86,11 +86,11 @@ export function el<T extends HTMLElement>(id: string): T | null {
 }
 
 export function initControls(): void {
-  for (const f of FEATURES) {
-    const s = SLIDERS[f];
-    if (!s) continue;
-    const input = el<HTMLInputElement>(s.id);
-    const output = el<HTMLOutputElement>(s.id + "Val");
+  for (const feature of FEATURES) {
+    const slider = SLIDERS[feature];
+    if (!slider) continue;
+    const input = el<HTMLInputElement>(slider.id);
+    const output = el<HTMLOutputElement>(slider.id + "Val");
     if (input && output) {
       input.addEventListener("input", () => {
         output.textContent = input.value + "%";
@@ -109,13 +109,13 @@ export function initControls(): void {
 
 export function readControls(): Settings {
   const overlays: Partial<Record<Feature, FeatureSettings>> = {};
-  for (const f of FEATURES) {
-    const cb = el<HTMLInputElement>("opt-" + f);
+  for (const feature of FEATURES) {
+    const cb = el<HTMLInputElement>("opt-" + feature);
     if (!cb?.checked) continue;
-    const s = SLIDERS[f];
-    overlays[f] = {
+    const slider = SLIDERS[feature];
+    overlays[feature] = {
       enabled: true,
-      size: s ? sliderVal(s.id, s.value) / 100 : 0.5,
+      size: slider ? sliderVal(slider.id, slider.value) / 100 : 0.5,
     };
   }
 
