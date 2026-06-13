@@ -18,6 +18,14 @@ export class DetectionLoop {
   private detector: Detector;
   private readonly settings: Settings;
 
+  private get canvasSize(): { width: number; height: number } {
+    const { canvas } = this.state;
+    return {
+      width: parseFloat(canvas.style.width) || canvas.width / devicePixelRatio,
+      height: parseFloat(canvas.style.height) || canvas.height / devicePixelRatio,
+    };
+  }
+
   get detectorName(): string {
     return this.detector.name;
   }
@@ -59,8 +67,7 @@ export class DetectionLoop {
   }
 
   private clearCanvas() {
-    const width = parseFloat(this.state.canvas.style.width) || this.state.canvas.width / devicePixelRatio;
-    const height = parseFloat(this.state.canvas.style.height) || this.state.canvas.height / devicePixelRatio;
+    const { width, height } = this.canvasSize;
     this.state.ctx.clearRect(0, 0, width, height);
   }
 
@@ -105,9 +112,8 @@ export class DetectionLoop {
   }
 
   private render() {
-    const { canvas, ctx, video, mirrored } = this.state;
-    const width = parseFloat(canvas.style.width) || canvas.width / devicePixelRatio;
-    const height = parseFloat(canvas.style.height) || canvas.height / devicePixelRatio;
+    const { ctx, video, mirrored } = this.state;
+    const { width, height } = this.canvasSize;
 
     this.clearCanvas();
 
