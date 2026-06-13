@@ -1,6 +1,8 @@
 import type { FaceBox } from "../shared/types";
 import { getEyeInfo } from "./eye-angle";
 
+const EYE_RADIUS = 4;
+
 export function renderDebugBox(
   ctx: CanvasRenderingContext2D,
   box: FaceBox,
@@ -29,9 +31,7 @@ export function renderDebugBox(
   const eyes = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored);
   if (!eyes) return;
 
-  const { cx, cy, cx2, cy2, halfDist, angle } = eyes;
-  const eyeR = Math.max(2, halfDist * 0.25);
-
+  const { cx, cy, cx2, cy2, angle } = eyes;
   const boxLeft = dx;
   const boxRight = dx + box.width * scaleX;
   const slope = Math.tan(angle);
@@ -48,9 +48,9 @@ export function renderDebugBox(
 
   ctx.fillStyle = "#ffdd44";
   ctx.beginPath();
-  ctx.arc(cx, cy, eyeR, 0, Math.PI * 2);
+  ctx.arc(cx, cy, EYE_RADIUS, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(cx2, cy2, eyeR, 0, Math.PI * 2);
+  ctx.arc(cx2, cy2, EYE_RADIUS, 0, Math.PI * 2);
   ctx.fill();
 }
