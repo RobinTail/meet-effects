@@ -44,7 +44,7 @@ function init() {
       applyToAllLoops(currentSettings);
       detector.start();
     } else {
-      for (const [, loop] of loops) loop.stop();
+      for (const loop of loops.values()) loop.stop();
       loops.clear();
       detector.stop();
     }
@@ -54,7 +54,7 @@ function init() {
 }
 
 function applyToAllLoops(settings: Settings) {
-  for (const [, loop] of loops) loop.applySettings(settings);
+  for (const loop of loops.values()) loop.applySettings(settings);
 }
 
 if (document.readyState === "complete") init();
