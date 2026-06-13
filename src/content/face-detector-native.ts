@@ -1,16 +1,6 @@
 import type { Detector } from "./detector";
 import type { FaceBox } from "../shared/types";
 
-interface NativeFaceLandmark {
-  type: string;
-  locations: { x: number; y: number }[];
-}
-
-interface NativeDetectedFace {
-  boundingBox: { x: number; y: number; width: number; height: number };
-  landmarks?: NativeFaceLandmark[];
-}
-
 /**
  * Enable Chrome Experimental Web Platform Features: Face Detection API
  * @link chrome://flags/#enable-experimental-web-platform-features
@@ -21,16 +11,12 @@ export class NativeDetector implements Detector {
   }
 
   readonly name = "native";
-  private detector: { detect(v: HTMLVideoElement): Promise<NativeDetectedFace[]> } | null = null;
+  private detector: FaceDetector | null = null;
 
   async init(): Promise<boolean> {
-    if (!NativeDetector.isSupported()) return false;
+    if (!FaceDetector) return false;
     try {
-      const FaceDetectorCtor = (globalThis as any).FaceDetector as new (opts?: {
-        maxDetectedFaces?: number;
-        fastMode?: boolean;
-      }) => typeof this.detector;
-      this.detector = new FaceDetectorCtor({ maxDetectedFaces: 10, fastMode: true });
+      this.detector = new FaceDetector({ maxDetectedFaces: 10, fastMode: true });
       return true;
     } catch {
       return false;
