@@ -49,7 +49,9 @@ export class NativeDetector implements Detector {
           }
         }
 
-        const eyes = face.landmarks.filter((lm) => lm.type === "eye");
+        const eyes = face.landmarks
+          .filter((lm) => lm.type === "eye")
+          .sort((one, other) => (one.locations[0]?.x ?? 0) - (other.locations[0]?.x ?? 0));
         if (eyes.length >= 2) {
           result.eyeLX = eyes[0].locations[0]?.x;
           result.eyeLY = eyes[0].locations[0]?.y;
