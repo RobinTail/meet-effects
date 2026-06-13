@@ -21,6 +21,18 @@ export interface PicoImage {
   ldim: number;
 }
 
+/** Sliding-window parameters for the cascade classifier. */
+export interface CascadeParams {
+  /** Window moves by this fraction of its size each step. */
+  shiftFactor: number;
+  /** Smallest face side length to detect (in detection-image pixels). */
+  minSize: number;
+  /** Largest face side length to detect (in detection-image pixels). */
+  maxSize: number;
+  /** Multiplier between successive window scales. */
+  scaleFactor: number;
+}
+
 /** A single face detection result, in detection-image coordinates. */
 export interface PicoDet {
   /** Row (y) of the detection-window center. */
@@ -92,17 +104,13 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
   };
 }
 
-export function runCascade(
-  image: PicoImage,
-  classifyRegion: ClassifyRegion,
-  params: { shiftfactor: number; minsize: number; maxsize: number; scalefactor: number },
-): PicoDet[] {
+export function runCascade(image: PicoImage, classifyRegion: ClassifyRegion, params: CascadeParams): PicoDet[] {
   const { pixels, nrows, ncols, ldim } = image;
-  const { shiftfactor, minsize, maxsize, scalefactor } = params;
-  let scale = minsize;
+  const { shiftFactor, minSize, maxSize, scaleFactor } = params;
+  let scale = minSize;
   const dets: PicoDet[] = [];
-  while (scale <= maxsize) {
-    const step = Math.max(shiftfactor * scale, 1) >> 0;
+  while (scale <= maxSize) {
+    const step = Math.max(shiftFactor * scale, 1) >> 0;
     const offset = (scale / 2 + 1) >> 0;
     for (let row = offset; row <= nrows - offset; row += step) {
       for (let col = offset; col <= ncols - offset; col += step) {
@@ -112,7 +120,7 @@ export function runCascade(
         }
       }
     }
-    scale = scale * scalefactor;
+    scale = scale * scaleFactor;
   }
   return dets;
 }

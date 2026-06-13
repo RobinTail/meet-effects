@@ -87,10 +87,10 @@ export class PicoDetector implements Detector {
     if (debugCanvas) renderPicoImage(picoImg, debugCanvas);
 
     const dets = runCascade(picoImg, PicoDetector.classifyRegion!, {
-      shiftfactor: SHIFT_FACTOR,
-      minsize: MIN_FACE_SIZE,
-      maxsize: Math.max(pw, ph),
-      scalefactor: SCALE_FACTOR,
+      shiftFactor: SHIFT_FACTOR,
+      minSize: MIN_FACE_SIZE,
+      maxSize: Math.max(pw, ph),
+      scaleFactor: SCALE_FACTOR,
     });
 
     return { dets, dimScale };
