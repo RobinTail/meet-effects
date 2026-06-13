@@ -6,7 +6,7 @@ import {
   clusterDetections,
   instantiateDetectionMemory,
 } from "./pico";
-import type { PicoDet, ClassifyRegion } from "./pico";
+import type { PicoDet, ClassifyRegion, UpdateMemory } from "./pico";
 import type { Detector } from "./detector";
 import type { FaceBox } from "../shared/types";
 
@@ -27,7 +27,7 @@ const SCALE_FACTOR = 1.1; // multiplier between successive window scales
 
 export class PicoDetector implements Detector {
   readonly name = "pico";
-  private readonly updateMemory: (dets: PicoDet[]) => PicoDet[];
+  private readonly updateMemory: UpdateMemory;
 
   private static classifyRegion: ClassifyRegion | null = null;
   private static cascadeLoaded = false;

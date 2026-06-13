@@ -31,6 +31,9 @@ export interface CascadeParams {
   scaleFactor: number;
 }
 
+/** Accumulates detections across frames for temporal smoothing. */
+export type UpdateMemory = (dets: PicoDet[]) => PicoDet[];
+
 /** A single face detection result, in detection-image coordinates. */
 export interface PicoDet {
   /** Row (y) of the detection-window center. */
@@ -187,12 +190,12 @@ export function clusterDetections(dets: PicoDet[], minOverlap: number): PicoDet[
   return clusters;
 }
 
-export function instantiateDetectionMemory(size: number): (dets: PicoDet[]) => PicoDet[] {
+export function instantiateDetectionMemory(size: number): UpdateMemory {
   let slot = 0;
   const memory: PicoDet[][] = [];
   for (let idx = 0; idx < size; idx++) memory.push([]);
 
-  return function updateMemory(dets: PicoDet[]): PicoDet[] {
+  return (dets) => {
     memory[slot] = dets.slice();
     slot = (slot + 1) % size;
     const all: PicoDet[] = [];
