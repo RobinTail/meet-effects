@@ -30,9 +30,7 @@ export class DetectionLoop {
   }
 
   private pickDetector(): Detector {
-    if (NativeDetector.isSupported()) {
-      return new NativeDetector();
-    }
+    if (NativeDetector.isSupported()) return new NativeDetector();
     return new PicoDetector();
   }
 
@@ -113,18 +111,14 @@ export class DetectionLoop {
 
     this.clearCanvas();
 
-    if (this.settings.overlays["curtains"]?.enabled) {
-      renderStripedCurtains(ctx, width, height);
-    }
-
+    if (this.settings.overlays["curtains"]?.enabled) renderStripedCurtains(ctx, width, height);
     if (!this.state.face) return;
 
     const scaleX = width / video.videoWidth;
     const scaleY = height / video.videoHeight;
 
-    if (this.settings.overlays["crown"]?.enabled) {
+    if (this.settings.overlays["crown"]?.enabled)
       renderCrown(ctx, this.state.face, width, scaleX, scaleY, mirrored, this.settings.overlays["crown"]?.size ?? 0.5);
-    }
 
     if (this.settings.overlays["sunglasses"]?.enabled) {
       renderSunglasses(
@@ -138,12 +132,9 @@ export class DetectionLoop {
       );
     }
 
-    if (this.settings.overlays["nose"]?.enabled) {
+    if (this.settings.overlays["nose"]?.enabled)
       renderNose(ctx, this.state.face, width, scaleX, scaleY, mirrored, this.settings.overlays["nose"]?.size ?? 0.15);
-    }
 
-    if (this.settings.debug) {
-      renderDebugBox(ctx, this.state.face, width, scaleX, scaleY, mirrored);
-    }
+    if (this.settings.debug) renderDebugBox(ctx, this.state.face, width, scaleX, scaleY, mirrored);
   }
 }

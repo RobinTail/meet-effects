@@ -54,9 +54,7 @@ export function controlsHTML(): string {
     <fieldset>
       <legend>Elements</legend>`;
 
-  for (const feature of FEATURES) {
-    html += featCheckbox(feature);
-  }
+  for (const feature of FEATURES) html += featCheckbox(feature);
 
   html += `</fieldset>
 
@@ -65,9 +63,7 @@ export function controlsHTML(): string {
       Debug mode
     </label>`;
 
-  for (const feature of FEATURES) {
-    html += featSlider(feature);
-  }
+  for (const feature of FEATURES) html += featSlider(feature);
 
   html += `
     <label class="row">

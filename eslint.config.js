@@ -10,6 +10,7 @@ export default tseslint.config(
     rules: {
       "id-length": ["error", { min: 2, exceptions: ["x", "y"] }],
       "@typescript-eslint/no-shadow": "warn",
+      curly: ["warn", "multi-or-nest", "consistent"],
     },
   },
   {

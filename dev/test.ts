@@ -21,11 +21,8 @@ let state: OverlayState | null = null;
 
 function applyControls() {
   const settings = readControls();
-  if (settings.enabled) {
-    loop?.start();
-  } else {
-    loop?.stop();
-  }
+  if (settings.enabled) loop?.start();
+  else loop?.stop();
   loop?.applySettings(settings);
 }
 
@@ -60,11 +57,8 @@ function syncCanvas() {
 
 async function startVideo(src: MediaProvider | string, mirrored: boolean) {
   try {
-    if (typeof src === "string") {
-      video.src = src;
-    } else {
-      video.srcObject = src;
-    }
+    if (typeof src === "string") video.src = src;
+    else video.srcObject = src;
     await video.play();
     video.classList.toggle("mirrored", mirrored);
     state = { video, canvas: overlay, ctx, animationId: null, face: null, mirrored };

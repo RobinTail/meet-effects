@@ -61,9 +61,7 @@ export function unpackCascade(bytes: Int8Array): ClassifyRegion {
   const leafCount = Math.pow(2, treeDepth);
   for (let tree = 0; tree < nTrees; ++tree) {
     codeList.push(0, 0, 0, 0);
-    for (let byte = 0; byte < 4 * leafCount - 4; ++byte) {
-      codeList.push(bytes[pos + byte]);
-    }
+    for (let byte = 0; byte < 4 * leafCount - 4; ++byte) codeList.push(bytes[pos + byte]);
     pos += 4 * leafCount - 4;
     for (let leaf = 0; leaf < leafCount; ++leaf) {
       for (let byte = 0; byte < 4; ++byte) view.setUint8(byte, bytes[pos + byte]);
@@ -116,9 +114,7 @@ export function runCascade(image: PicoImage, classifyRegion: ClassifyRegion, par
     for (let row = offset; row <= height - offset; row += step) {
       for (let col = offset; col <= width - offset; col += step) {
         const score = classifyRegion(row, col, scale, pixels, width);
-        if (score > 0.0) {
-          findings.push({ row, col, size: scale, score });
-        }
+        if (score > 0.0) findings.push({ row, col, size: scale, score });
       }
     }
     scale = scale * scaleFactor;

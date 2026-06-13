@@ -54,11 +54,8 @@ function drawSideCurtain(
     ctx.fillStyle = idx % 2 === 0 ? STRIPE_RED : STRIPE_WHITE;
     ctx.fillRect(sx, y, stripeW, height);
     ctx.fillStyle = FOLD_SHADOW;
-    if (mirror) {
-      ctx.fillRect(sx, y, shadowW, height);
-    } else {
-      ctx.fillRect(sx + stripeW - shadowW, y, shadowW, height);
-    }
+    if (mirror) ctx.fillRect(sx, y, shadowW, height);
+    else ctx.fillRect(sx + stripeW - shadowW, y, shadowW, height);
   }
 
   ctx.restore();

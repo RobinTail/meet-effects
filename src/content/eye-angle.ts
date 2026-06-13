@@ -18,9 +18,7 @@ export function getEyeInfo(
   scaleY: number,
   mirrored: boolean,
 ): EyeInfo | undefined {
-  if (box.eyeLX === undefined || box.eyeLY === undefined || box.eyeRX === undefined || box.eyeRY === undefined) {
-    return undefined;
-  }
+  if (box.eyeLX === undefined || box.eyeLY === undefined || box.eyeRX === undefined || box.eyeRY === undefined) return;
 
   const lx = box.eyeLX * scaleX;
   const ly = box.eyeLY * scaleY;

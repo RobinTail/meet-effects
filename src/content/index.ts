@@ -37,11 +37,9 @@ function init() {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "sync") return;
     const partial: Record<string, unknown> = {};
-    for (const [key, { newValue }] of Object.entries(changes)) {
-      partial[key] = newValue;
-    }
-    currentSettings = { ...DEFAULT_SETTINGS, ...currentSettings, ...partial };
+    for (const [key, { newValue }] of Object.entries(changes)) partial[key] = newValue;
 
+    currentSettings = { ...DEFAULT_SETTINGS, ...currentSettings, ...partial };
     if (currentSettings.enabled) {
       applyToAllLoops(currentSettings);
       detector.start();
@@ -56,13 +54,8 @@ function init() {
 }
 
 function applyToAllLoops(settings: Settings) {
-  for (const [, loop] of loops) {
-    loop.applySettings(settings);
-  }
+  for (const [, loop] of loops) loop.applySettings(settings);
 }
 
-if (document.readyState === "complete") {
-  init();
-} else {
-  window.addEventListener("load", init);
-}
+if (document.readyState === "complete") init();
+else window.addEventListener("load", init);

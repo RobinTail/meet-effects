@@ -28,9 +28,7 @@ export class OverlayManager {
 
     const parentEl = parent as HTMLElement;
     const pos = getComputedStyle(parentEl).position;
-    if (pos === "static") {
-      parentEl.style.position = "relative";
-    }
+    if (pos === "static") parentEl.style.position = "relative";
 
     parent.insertBefore(canvas, video.nextSibling);
 
@@ -55,13 +53,8 @@ export class OverlayManager {
   detach(video: HTMLVideoElement) {
     const state = this.states.get(video);
     if (!state) return;
-
     this.resizeObserver.unobserve(state.video);
-
-    if (state.animationId !== null) {
-      cancelAnimationFrame(state.animationId);
-    }
-
+    if (state.animationId !== null) cancelAnimationFrame(state.animationId);
     state.canvas.remove();
     this.states.delete(video);
   }
@@ -71,9 +64,7 @@ export class OverlayManager {
   }
 
   private findState(element: Element): OverlayState | undefined {
-    for (const state of this.states.values()) {
-      if (state.video === element) return state;
-    }
+    for (const state of this.states.values()) if (state.video === element) return state;
     return;
   }
 
@@ -97,8 +88,6 @@ export class OverlayManager {
 
   destroy() {
     this.resizeObserver.disconnect();
-    for (const [video] of this.states) {
-      this.detach(video);
-    }
+    for (const [video] of this.states) this.detach(video);
   }
 }

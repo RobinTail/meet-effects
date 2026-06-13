@@ -31,9 +31,7 @@ export class TileDetector {
   }
 
   private initialScan() {
-    for (const video of this.findVideos()) {
-      this.addTile(video);
-    }
+    for (const video of this.findVideos()) this.addTile(video);
     this.emit();
   }
 
@@ -59,19 +57,8 @@ export class TileDetector {
 
   private syncTiles() {
     const live = new Set(this.findVideos());
-
-    for (const video of this.videos) {
-      if (!live.has(video) || !document.contains(video)) {
-        this.removeTile(video);
-      }
-    }
-
-    for (const video of live) {
-      if (!this.videos.has(video)) {
-        this.addTile(video);
-      }
-    }
-
+    for (const video of this.videos) if (!live.has(video) || !document.contains(video)) this.removeTile(video);
+    for (const video of live) if (!this.videos.has(video)) this.addTile(video);
     this.emit();
   }
 
