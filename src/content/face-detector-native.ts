@@ -36,19 +36,6 @@ export class NativeDetector implements Detector {
         height: face.boundingBox.height,
       };
       if (face.landmarks) {
-        const nose = face.landmarks.find((lm) => lm.type === "nose");
-        if (nose?.locations?.[0]) {
-          result.noseX = nose.locations[0].x;
-          result.noseY = nose.locations[0].y;
-        } else {
-          const eye = face.landmarks.find((lm) => lm.type === "eye");
-          const mouth = face.landmarks.find((lm) => lm.type === "mouth");
-          if (eye?.locations?.[0] && mouth?.locations?.[0]) {
-            result.noseX = mouth.locations[0].x;
-            result.noseY = (eye.locations[0].y + mouth.locations[0].y) / 2;
-          }
-        }
-
         const eyes = face.landmarks
           .filter((lm) => lm.type === "eye")
           .sort((one, other) => (one.locations[0]?.x ?? 0) - (other.locations[0]?.x ?? 0));
@@ -57,6 +44,19 @@ export class NativeDetector implements Detector {
           result.eyeLY = eyes[0].locations[0]?.y;
           result.eyeRX = eyes[1].locations[0]?.x;
           result.eyeRY = eyes[1].locations[0]?.y;
+        }
+
+        const nose = face.landmarks.find((lm) => lm.type === "nose");
+        if (nose?.locations?.[0]) {
+          result.noseX = nose.locations[0].x;
+          result.noseY = nose.locations[0].y;
+        } else if (result.eyeLY !== undefined && result.eyeRY !== undefined) {
+          const mouth = face.landmarks.find((lm) => lm.type === "mouth");
+          if (mouth?.locations?.[0]) {
+            const eyesMidY = (result.eyeLY + result.eyeRY) / 2;
+            result.noseX = mouth.locations[0].x;
+            result.noseY = (eyesMidY + mouth.locations[0].y) / 2;
+          }
         }
       }
 
