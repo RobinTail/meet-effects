@@ -1,6 +1,6 @@
 {
   "name": "meet-effects",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "AI-driven Chrome extension that overlays features on detected faces in Google Meet",
   "license": "MIT",
