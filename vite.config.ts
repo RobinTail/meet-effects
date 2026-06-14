@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import { crx, ManifestV3Export } from "@crxjs/vite-plugin";
 import { version, description } from "./package.json" with { type: "json" };
@@ -46,6 +47,23 @@ const commonDefinitions = {
 };
 
 export default defineConfig(({ mode }) => {
+  if (mode === "test") {
+    return {
+      define: {
+        ...commonDefinitions,
+        CASCADE_URL: JSON.stringify("/cascades/facefinder"),
+      },
+      test: {
+        globals: true,
+        coverage: {
+          enabled: true,
+          provider: "v8",
+          include: ["src/**/*.ts"],
+        },
+      },
+    };
+  }
+
   if (mode === "dev") {
     return {
       root: ".",

@@ -1,0 +1,48 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`controlsHTML > matches snapshot 1`] = `
+"
+    <h1>Meet Effects</h1>
+
+    <label class="row">
+      <input type="checkbox" id="enabled" checked />
+      Enable overlays
+    </label>
+
+    <fieldset>
+      <legend>Elements</legend>
+    <label class="row">
+      <input type="checkbox" id="opt-sunglasses" checked />
+      Sunglasses
+    </label>
+    <label class="row">
+      <input type="checkbox" id="opt-crown" checked />
+      Crown
+    </label></fieldset>
+
+    <label class="row">
+      <input type="checkbox" id="debug" />
+      Debug mode
+    </label>
+    <label class="row">
+      Sunglasses size
+      <span class="range-wrap">
+        <input type="range" id="size-sunglasses" min="30" max="75" value="60" />
+        <output id="size-sunglassesVal">60%</output>
+      </span>
+    </label>
+    <label class="row">
+      Crown size
+      <span class="range-wrap">
+        <input type="range" id="size-crown" min="20" max="100" value="50" />
+        <output id="size-crownVal">50%</output>
+      </span>
+    </label>
+    <label class="row">
+      Detection FPS
+      <span class="range-wrap">
+        <input type="range" id="fps" min="1" max="30" value="15" />
+        <output id="fpsVal">15</output>
+      </span>
+    </label>"
+`;
