@@ -124,7 +124,14 @@ export class DetectionLoop {
     const { ctx, mirrored } = this.state;
     const params = { ctx, mirrored, ...this.canvasSize, box: this.state.face };
     this.clearCanvas();
-    for (const feature of FEATURES) if (this.settings.overlays[feature]?.enabled) RENDERERS[feature](params);
+    for (const feature of FEATURES) {
+      if (this.settings.overlays[feature]?.enabled) {
+        RENDERERS[feature]({
+          ...params,
+          size: this.settings.overlays[feature]?.size ?? 1,
+        });
+      }
+    }
     if (this.settings.debug) renderDebugBox(params);
   }
 }
