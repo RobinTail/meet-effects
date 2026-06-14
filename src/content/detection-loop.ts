@@ -1,4 +1,4 @@
-import type { OverlayState, Settings } from "../shared/types";
+import type { Feature, FeatureRenderer, OverlayState, Settings } from "../shared/types";
 import type { Detector } from "./detector";
 import { NativeDetector } from "./face-detector-native";
 import { PicoDetector } from "./face-detector-pico";
@@ -9,6 +9,13 @@ import { renderCrown } from "./crown-renderer";
 import { renderDebugBox } from "./debug-renderer";
 import { DEFAULT_SETTINGS } from "../shared/types";
 
+const RENDERERS: Record<Feature, FeatureRenderer> = {
+  curtains: renderStripedCurtains,
+  crown: renderCrown,
+  sunglasses: renderSunglasses,
+  nose: renderNose,
+};
+
 export class DetectionLoop {
   private readonly state: OverlayState;
   private running = false;
@@ -18,12 +25,13 @@ export class DetectionLoop {
   private detector: Detector;
   private readonly settings: Settings;
 
-  private get canvasSize(): { width: number; height: number } {
+  private get canvasSize() {
     const { canvas } = this.state;
-    return {
-      width: parseFloat(canvas.style.width) || canvas.width / devicePixelRatio,
-      height: parseFloat(canvas.style.height) || canvas.height / devicePixelRatio,
-    };
+    const canvasW = parseFloat(canvas.style.width) || canvas.width / devicePixelRatio;
+    const canvasH = parseFloat(canvas.style.height) || canvas.height / devicePixelRatio;
+    const scaleX = canvasW / this.state.video.videoWidth;
+    const scaleY = canvasH / this.state.video.videoHeight;
+    return { canvasW, canvasH, scaleX, scaleY };
   }
 
   get detectorName(): string {
@@ -67,8 +75,8 @@ export class DetectionLoop {
   }
 
   private clearCanvas() {
-    const { width, height } = this.canvasSize;
-    this.state.ctx.clearRect(0, 0, width, height);
+    const { canvasW, canvasH } = this.canvasSize;
+    this.state.ctx.clearRect(0, 0, canvasW, canvasH);
   }
 
   private schedule() {
@@ -113,35 +121,10 @@ export class DetectionLoop {
   }
 
   private render() {
-    const { ctx, video, mirrored } = this.state;
-    const { width, height } = this.canvasSize;
-
+    const { ctx, mirrored } = this.state;
+    const params = { ctx, mirrored, ...this.canvasSize, box: this.state.face };
     this.clearCanvas();
-
-    if (this.settings.overlays["curtains"]?.enabled) renderStripedCurtains(ctx, width, height);
-    if (!this.state.face) return;
-
-    const scaleX = width / video.videoWidth;
-    const scaleY = height / video.videoHeight;
-
-    if (this.settings.overlays["crown"]?.enabled)
-      renderCrown(ctx, this.state.face, width, scaleX, scaleY, mirrored, this.settings.overlays["crown"]?.size ?? 0.5);
-
-    if (this.settings.overlays["sunglasses"]?.enabled) {
-      renderSunglasses(
-        ctx,
-        this.state.face,
-        width,
-        scaleX,
-        scaleY,
-        mirrored,
-        this.settings.overlays["sunglasses"]?.size ?? 0.6,
-      );
-    }
-
-    if (this.settings.overlays["nose"]?.enabled)
-      renderNose(ctx, this.state.face, width, scaleX, scaleY, mirrored, this.settings.overlays["nose"]?.size ?? 0.15);
-
-    if (this.settings.debug) renderDebugBox(ctx, this.state.face, width, scaleX, scaleY, mirrored);
+    for (const feature of FEATURES) if (this.settings.overlays[feature]?.enabled) RENDERERS[feature](params);
+    if (this.settings.debug) renderDebugBox(params);
   }
 }

@@ -1,4 +1,4 @@
-import type { FaceBox } from "../shared/types";
+import type { FeatureRenderer } from "../shared/types";
 import { getEyeInfo } from "./eye-angle";
 
 const PEAK_X = [0, 0.5, 1];
@@ -10,19 +10,12 @@ const JEWEL_Y = [0.5, 0.4, 0.5];
 const JEWEL_R = [0.028, 0.035, 0.028];
 const TILT_SHIFT = 2;
 
-export function renderCrown(
-  ctx: CanvasRenderingContext2D,
-  box: FaceBox,
-  canvasW: number,
-  scaleX: number,
-  scaleY: number,
-  mirrored: boolean,
-  crownSize: number,
-) {
+export const renderCrown: FeatureRenderer = ({ ctx, box, mirrored, canvasW, scaleX, scaleY, size = 0.5 }) => {
+  if (!box) return;
   const cx = mirrored ? canvasW - (box.x + box.width / 2) * scaleX : (box.x + box.width / 2) * scaleX;
   const topY = box.y * scaleY;
   const cw = box.width * scaleX;
-  const ch = box.height * crownSize * scaleY;
+  const ch = box.height * size * scaleY;
 
   const angle = getEyeInfo(box, canvasW, scaleX, scaleY, mirrored)?.angle ?? 0;
 
@@ -100,4 +93,4 @@ export function renderCrown(
   }
 
   ctx.restore();
-}
+};

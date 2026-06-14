@@ -1,24 +1,17 @@
-import type { FaceBox } from "../shared/types";
+import type { FeatureRenderer } from "../shared/types";
 
 const NOSE_CX = 0.5;
 const NOSE_CY = 0.6;
 
-export function renderNose(
-  ctx: CanvasRenderingContext2D,
-  box: FaceBox,
-  canvasW: number,
-  scaleX: number,
-  scaleY: number,
-  mirrored: boolean,
-  noseSize: number,
-) {
+export const renderNose: FeatureRenderer = ({ ctx, box, canvasW, scaleX, scaleY, mirrored, size = 0.15 }) => {
+  if (!box) return;
   const noseX = box.noseX != null ? box.noseX : box.x + box.width * NOSE_CX;
   const noseY = box.noseY != null ? box.noseY : box.y + box.height * NOSE_CY;
   const x = noseX * scaleX;
   const y = noseY * scaleY;
   const cx = mirrored ? canvasW - x : x;
   const cy = y;
-  const noseRadius = box.height * noseSize * scaleY;
+  const noseRadius = box.height * size * scaleY;
 
   // 3D ball gradient — light from upper-left
   const grad = ctx.createRadialGradient(
@@ -46,4 +39,4 @@ export function renderNose(
   ctx.ellipse(cx - noseRadius * 0.25, cy - noseRadius * 0.3, hlw, hlh, 0.9, 0, Math.PI * 2);
   ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
   ctx.fill();
-}
+};

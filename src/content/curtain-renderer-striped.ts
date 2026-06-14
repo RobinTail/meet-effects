@@ -1,3 +1,5 @@
+import type { FeatureRenderer } from "../shared/types";
+
 const STRIPE_RED = "#cc0000";
 const STRIPE_WHITE = "#f0eee8";
 const FOLD_SHADOW = "rgba(0,0,0,0.12)";
@@ -90,11 +92,11 @@ function drawTopValance(
   ctx.restore();
 }
 
-export function renderStripedCurtains(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  const sideWidth = clamp(Math.round(width * SIDE_WIDTH_FRACTION), SIDE_WIDTH_MIN, SIDE_WIDTH_MAX);
-  const topHeight = clamp(Math.round(height * TOP_HEIGHT_FRACTION), TOP_HEIGHT_MIN, TOP_HEIGHT_MAX);
+export const renderStripedCurtains: FeatureRenderer = ({ ctx, canvasW, canvasH }) => {
+  const sideWidth = clamp(Math.round(canvasW * SIDE_WIDTH_FRACTION), SIDE_WIDTH_MIN, SIDE_WIDTH_MAX);
+  const topHeight = clamp(Math.round(canvasH * TOP_HEIGHT_FRACTION), TOP_HEIGHT_MIN, TOP_HEIGHT_MAX);
 
-  drawTopValance(ctx, 0, 0, width, topHeight, sideWidth);
-  drawSideCurtain(ctx, 0, 0, sideWidth, height, false);
-  drawSideCurtain(ctx, width - sideWidth, 0, sideWidth, height, true);
-}
+  drawTopValance(ctx, 0, 0, canvasW, topHeight, sideWidth);
+  drawSideCurtain(ctx, 0, 0, sideWidth, canvasH, false);
+  drawSideCurtain(ctx, canvasW - sideWidth, 0, sideWidth, canvasH, true);
+};
