@@ -11,7 +11,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": false,
-    "types": ["chrome"]
+    "types": ["chrome", "vitest/globals"]
   },
   "include": ["src/**/*.ts", "dev/**/*.ts", "vite-env.d.ts"]
 }
