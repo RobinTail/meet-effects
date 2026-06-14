@@ -24,24 +24,16 @@ export interface EyeInfo {
 }
 
 /**
- * Derive eye positions, midpoint, angle, and half-distance from a detected
- * face, transforming landmark coordinates into canvas-pixel space.
+ * Derive eye positions, midpoint, angle, and half-distance from a detected face, transforming landmark coordinates
+ * into canvas-pixel space. Left/right assignments follow the source image's orientation (the detector's own left/right
+ * labels). When {@code mirrored} is true the x-coordinates are flipped so the rendering matches a mirrored video feed.
  *
- * Left/right assignments follow the source image's orientation (the detector's
- * own left/right labels). When {@code mirrored} is true the x-coordinates are
- * flipped so the rendering matches a mirrored video feed (e.g. selfie cam).
- *
- * @param box      Face detection result containing eye landmark coordinates in
- *                 source-video pixels.
- * @param canvasW  Width of the output canvas, used for x-flipping when
- *                 {@code mirrored} is true.
- * @param scaleX   Horizontal scale factor from source-video space to canvas
- *                 space ( {@code canvasWidth / videoWidth}).
- * @param scaleY   Vertical scale factor from source-video space to canvas
- *                 space ( {@code canvasHeight / videoHeight}).
+ * @param box      Face detection result containing eye landmark coordinates in source-video pixels.
+ * @param canvasW  Width of the output canvas, used for x-flipping when {@code mirrored} is true.
+ * @param scaleX   Horizontal scale factor from source-video space to canvas space ( {@code canvasWidth / videoWidth}).
+ * @param scaleY   Vertical scale factor from source-video space to canvas space ( {@code canvasHeight / videoHeight}).
  * @param mirrored Whether the canvas is horizontally mirrored (selfie mode).
- *                 When true, x-coordinates are reflected and the eye angle is
- *                 negated.
+ *                 When true, x-coordinates are reflected and the eye angle is negated.
  * @returns Computed eye info, or {@code undefined} if any eye landmark is missing.
  */
 export function getEyeInfo(
