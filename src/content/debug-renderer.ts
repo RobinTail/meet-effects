@@ -1,16 +1,10 @@
-import type { FaceBox } from "../shared/types";
+import type { FeatureRenderer } from "../shared/types";
 import { getEyeInfo } from "./eye-angle";
 
 const EYE_RADIUS = 4;
 
-export function renderDebugBox(
-  ctx: CanvasRenderingContext2D,
-  box: FaceBox,
-  canvasW: number,
-  scaleX: number,
-  scaleY: number,
-  mirrored: boolean,
-) {
+export const renderDebugBox: FeatureRenderer = ({ ctx, box, canvasW, scaleX, scaleY, mirrored }) => {
+  if (!box) return;
   const dx = mirrored ? canvasW - (box.x + box.width) * scaleX : box.x * scaleX;
 
   ctx.strokeStyle = "#ff4444";
@@ -53,4 +47,4 @@ export function renderDebugBox(
   ctx.beginPath();
   ctx.arc(cx2, cy2, EYE_RADIUS, 0, Math.PI * 2);
   ctx.fill();
-}
+};

@@ -70,3 +70,16 @@ export interface OverlayState {
   /** Optional canvas to render the grayscale image pico sees (for debugging). */
   debugCanvas?: HTMLCanvasElement;
 }
+
+export interface RenderParams {
+  ctx: CanvasRenderingContext2D;
+  box: FaceBox | null;
+  canvasW: number;
+  canvasH: number;
+  mirrored: boolean;
+  scaleX: number;
+  scaleY: number;
+  size?: number;
+}
+
+export type FeatureRenderer = (params: RenderParams) => void;
