@@ -122,8 +122,10 @@ export class DetectionLoop {
 
   private render() {
     const { ctx, mirrored } = this.state;
-    const params = { ctx, mirrored, ...this.canvasSize, box: this.state.face };
+    const { canvasW, canvasH, scaleX, scaleY } = this.canvasSize;
     this.clearCanvas();
+    if (!Number.isFinite(scaleX) || !Number.isFinite(scaleY)) return;
+    const params = { ctx, mirrored, canvasW, canvasH, scaleX, scaleY, box: this.state.face };
     for (const feature of FEATURES) {
       if (this.settings.overlays[feature]?.enabled)
         RENDERERS[feature]({ ...params, size: this.settings.overlays[feature]?.size });
